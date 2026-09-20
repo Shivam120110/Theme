@@ -1,0 +1,220 @@
+{% comment %}
+  Section: collection-grid.liquid
+  Purpose: Main collection page — banner, sort/filter toolbar, product grid, pagination.
+  Brand: Saanjh — quiet luxury, no urgency.
+{% endcomment %}
+
+{% assign products_per_page = section.settings.products_per_page %}
+
+<link rel="stylesheet" href="{{ 'collection.css' | asset_url }}" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="{{ 'collection.css' | asset_url }}"></noscript>
+
+{%- comment -%} ── 1. Collection Banner ── {%- endcomment -%}
+{% if section.settings.show_collection_image and collection.image %}
+  <section
+    class="collection-banner"
+    aria-label="{{ collection.title | escape }} banner"
+    style="--banner-image: url('{{ collection.image | image_url: width: 1600 }}')"
+  >
+    <div class="collection-banner__overlay"></div>
+    <div class="collection-banner__content container">
+      <h1 class="collection-banner__title">{{ collection.title }}</h1>
+      {% if section.settings.show_collection_description and collection.description != blank %}
+        <div class="collection-banner__description">
+          {{ collection.description }}
+        </div>
+      {% endif %}
+    </div>
+  </section>
+{% else %}
+  {%- comment -%} Fallback banner — no image {%- endcomment -%}
+  <section class="collection-banner collection-banner--text-only" aria-label="{{ collection.title | escape }} banner">
+    <div class="collection-banner__content container">
+      <h1 class="collection-banner__title">{{ collection.title }}</h1>
+      {% if section.settings.show_collection_description and collection.description != blank %}
+        <div class="collection-banner__description">
+          {{ collection.description }}
+        </div>
+      {% endif %}
+    </div>
+  </section>
+{% endif %}
+
+{%- comment -%} ── 2. Toolbar: product count + sort ── {%- endcomment -%}
+<div class="collection-toolbar container" role="toolbar" aria-label="Collection controls">
+
+  <p class="collection-toolbar__count" aria-live="polite">
+    {%- if collection.products_count == 1 -%}
+      Showing 1 piece
+    {%- else -%}
+      Showing {{ collection.products_count }} pieces
+    {%- endif -%}
+  </p>
+
+  {% if section.settings.enable_sorting %}
+    <div class="collection-toolbar__sort">
+      <label class="collection-toolbar__sort-label" for="SortSelect">Sort by:</label>
+      <div class="collection-toolbar__sort-wrapper">
+        <select
+          id="SortSelect"
+          class="collection-toolbar__sort-select"
+          name="sort_by"
+          aria-label="Sort products"
+          data-sort-select
+        >
+          {%- assign sort_by = collection.sort_by | default: collection.default_sort_by -%}
+          {% for option in collection.sort_options %}
+            <option
+              value="{{ option.value }}"
+              {% if option.value == sort_by %}selected{% endif %}
+            >
+              {{ option.name }}
+            </option>
+          {% endfor %}
+        </select>
+        <span class="collection-toolbar__sort-chevron" aria-hidden="true">
+          {% render 'icon-chevron-down' %}
+        </span>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+{%- comment -%} ── 3. Product Grid ── {%- endcomment -%}
+{% paginate collection.products by products_per_page %}
+
+  <main class="collection-grid-wrapper container" id="CollectionProductGrid">
+
+    {% if collection.products.size > 0 %}
+      <ul
+        class="collection-grid"
+        role="list"
+        aria-label="Products in {{ collection.title | escape }}"
+      >
+        {% for product in collection.products %}
+          <li class="collection-grid__item">
+            {% render 'product-card', product: product %}
+          </li>
+        {% endfor %}
+      </ul>
+
+    {% else %}
+      {%- comment -%} Empty state — gentle brand-voiced message {%- endcomment -%}
+      <div class="collection-empty" role="status">
+        <span class="collection-empty__icon" aria-hidden="true">
+          {% render 'icon-sparkle' %}
+        </span>
+        <p class="collection-empty__message">Nothing here yet — check back soon.</p>
+        <a href="/collections/all" class="collection-empty__link">Browse all jewellery</a>
+      </div>
+    {% endif %}
+
+    {%- comment -%} ── 4. Pagination ── {%- endcomment -%}
+    {% if paginate.pages > 1 %}
+      <nav class="pagination" aria-label="Collection pagination">
+        <ul class="pagination__list" role="list">
+
+          {% if paginate.previous %}
+            <li class="pagination__item pagination__item--prev">
+              <a
+                href="{{ paginate.previous.url }}"
+                class="pagination__link pagination__link--arrow"
+                aria-label="Previous page"
+              >
+                {% render 'icon-arrow-left' %}
+              </a>
+            </li>
+          {% endif %}
+
+          {% for part in paginate.parts %}
+            {% if part.is_link %}
+              <li class="pagination__item">
+                <a
+                  href="{{ part.url }}"
+                  class="pagination__link"
+                  aria-label="Page {{ part.title }}"
+                >
+                  {{ part.title }}
+                </a>
+              </li>
+            {% elsif part.title == paginate.current_page %}
+              <li class="pagination__item pagination__item--current">
+                <span
+                  class="pagination__link pagination__link--active"
+                  aria-current="page"
+                  aria-label="Page {{ part.title }}, current page"
+                >
+                  {{ part.title }}
+                </span>
+              </li>
+            {% else %}
+              <li class="pagination__item pagination__item--ellipsis" aria-hidden="true">
+                <span class="pagination__ellipsis">…</span>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if paginate.next %}
+            <li class="pagination__item pagination__item--next">
+              <a
+                href="{{ paginate.next.url }}"
+                class="pagination__link pagination__link--arrow"
+                aria-label="Next page"
+              >
+                {% render 'icon-arrow-right' %}
+              </a>
+            </li>
+          {% endif %}
+
+        </ul>
+      </nav>
+    {% endif %}
+
+  </main>
+
+{% endpaginate %}
+
+<script src="{{ 'collection.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Collection Grid",
+  "tag": "section",
+  "class": "section-collection-grid",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per page",
+      "min": 8,
+      "max": 24,
+      "step": 4,
+      "default": 12
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_image",
+      "label": "Show collection banner image",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_description",
+      "label": "Show collection description",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sorting",
+      "label": "Enable sort dropdown",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Grid"
+    }
+  ]
+}
+{% endschema %}

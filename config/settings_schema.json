@@ -1,0 +1,298 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Saanjh",
+    "theme_version": "1.0.0",
+    "theme_author": "Saanjh Fine Jewellery",
+    "theme_documentation_url": "https://saanjh.in",
+    "theme_support_url": "https://saanjh.in"
+  },
+
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Brand Colors"
+      },
+      {
+        "type": "color",
+        "id": "color_bg",
+        "label": "Background",
+        "default": "#F7F4EF",
+        "info": "Main page background — warm off-white"
+      },
+      {
+        "type": "color",
+        "id": "color_ink",
+        "label": "Ink (Text)",
+        "default": "#1C1B1A",
+        "info": "Primary text and icon color"
+      },
+      {
+        "type": "color",
+        "id": "color_accent",
+        "label": "Accent (Gold)",
+        "default": "#B08A5A",
+        "info": "Gold accent — links, highlights, active states"
+      },
+      {
+        "type": "color",
+        "id": "color_surface",
+        "label": "Surface",
+        "default": "#EFEBE3",
+        "info": "Card, panel, and section surface color"
+      },
+      {
+        "type": "color",
+        "id": "color_muted",
+        "label": "Muted",
+        "default": "#8A8680",
+        "info": "Secondary text, captions, placeholder copy"
+      },
+      {
+        "type": "color",
+        "id": "color_cta",
+        "label": "CTA (Call to Action)",
+        "default": "#8B2635",
+        "info": "Primary CTA button — deep burgundy-red"
+      }
+    ]
+  },
+
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Display Font (Headings)"
+      },
+      {
+        "type": "font_picker",
+        "id": "font_display",
+        "label": "Display / Heading Font",
+        "default": "cormorant_garamond_n4",
+        "info": "Used for h1–h3, product names, and editorial headings. Cormorant Garamond recommended."
+      },
+      {
+        "type": "header",
+        "content": "Body Font (UI & Copy)"
+      },
+      {
+        "type": "font_picker",
+        "id": "font_body",
+        "label": "Body / UI Font",
+        "default": "poppins_n4",
+        "info": "Used for body copy, navigation, labels, and buttons. Poppins recommended."
+      },
+      {
+        "type": "header",
+        "content": "Font Sizing"
+      },
+      {
+        "type": "range",
+        "id": "font_size_base",
+        "label": "Base Font Size (px)",
+        "min": 14,
+        "max": 20,
+        "step": 1,
+        "default": 16,
+        "unit": "px",
+        "info": "The root font size all rem values scale from"
+      },
+      {
+        "type": "range",
+        "id": "font_size_scale",
+        "label": "Heading Scale Factor",
+        "min": 100,
+        "max": 150,
+        "step": 5,
+        "default": 120,
+        "unit": "%",
+        "info": "Controls how large headings grow relative to body text"
+      }
+    ]
+  },
+
+  {
+    "name": "Layout",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Announcement Bar"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_announcement_bar",
+        "label": "Enable announcement bar",
+        "default": true,
+        "info": "Show a slim top bar above the header for promotions or notices"
+      },
+      {
+        "type": "text",
+        "id": "announcement_text",
+        "label": "Announcement text",
+        "default": "Complimentary shipping on all orders above ₹3,000",
+        "info": "Short message displayed in the announcement bar"
+      },
+      {
+        "type": "color",
+        "id": "announcement_bg",
+        "label": "Announcement bar background",
+        "default": "#1C1B1A"
+      },
+      {
+        "type": "color",
+        "id": "announcement_text_color",
+        "label": "Announcement bar text color",
+        "default": "#F7F4EF"
+      },
+      {
+        "type": "header",
+        "content": "Header"
+      },
+      {
+        "type": "checkbox",
+        "id": "sticky_header",
+        "label": "Sticky header",
+        "default": true,
+        "info": "Keep the header visible as users scroll down"
+      },
+      {
+        "type": "select",
+        "id": "header_layout",
+        "label": "Header layout",
+        "options": [
+          { "value": "logo_left", "label": "Logo left, nav right" },
+          { "value": "logo_center", "label": "Logo centered, nav below" },
+          { "value": "logo_center_split", "label": "Nav split either side of logo" }
+        ],
+        "default": "logo_left",
+        "info": "Controls how the logo and navigation are arranged"
+      },
+      {
+        "type": "header",
+        "content": "Page Width"
+      },
+      {
+        "type": "range",
+        "id": "page_width",
+        "label": "Maximum page width (px)",
+        "min": 1000,
+        "max": 1600,
+        "step": 40,
+        "default": 1400,
+        "unit": "px"
+      },
+      {
+        "type": "range",
+        "id": "grid_gutter",
+        "label": "Grid gutter / page padding (px)",
+        "min": 16,
+        "max": 48,
+        "step": 4,
+        "default": 24,
+        "unit": "px"
+      }
+    ]
+  },
+
+  {
+    "name": "Social Media",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Social Profiles"
+      },
+      {
+        "type": "text",
+        "id": "instagram_url",
+        "label": "Instagram URL",
+        "default": "",
+        "placeholder": "https://www.instagram.com/saanjhjewellery",
+        "info": "Full URL to your Instagram profile"
+      },
+      {
+        "type": "text",
+        "id": "facebook_url",
+        "label": "Facebook URL",
+        "default": "",
+        "placeholder": "https://www.facebook.com/saanjhjewellery",
+        "info": "Full URL to your Facebook page"
+      },
+      {
+        "type": "text",
+        "id": "pinterest_url",
+        "label": "Pinterest URL",
+        "default": "",
+        "placeholder": "https://www.pinterest.com/saanjhjewellery",
+        "info": "Full URL to your Pinterest profile"
+      },
+      {
+        "type": "text",
+        "id": "youtube_url",
+        "label": "YouTube URL",
+        "default": "",
+        "placeholder": "https://www.youtube.com/@saanjhjewellery",
+        "info": "Full URL to your YouTube channel (optional)"
+      }
+    ]
+  },
+
+  {
+    "name": "Brand",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Brand Identity"
+      },
+      {
+        "type": "text",
+        "id": "brand_name",
+        "label": "Brand name",
+        "default": "Saanjh",
+        "info": "Used in page titles, meta tags, and fallback text when no logo image is set"
+      },
+      {
+        "type": "text",
+        "id": "tagline",
+        "label": "Brand tagline",
+        "default": "Fine Jewellery, Quiet Luxury",
+        "info": "Short brand statement — used in the homepage hero and SEO meta description"
+      },
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo image",
+        "info": "Recommended: SVG or PNG with transparent background, min 400px wide"
+      },
+      {
+        "type": "range",
+        "id": "logo_width",
+        "label": "Logo width (px)",
+        "min": 60,
+        "max": 300,
+        "step": 10,
+        "default": 120,
+        "unit": "px",
+        "info": "Controls the rendered width of the logo in the header"
+      },
+      {
+        "type": "image_picker",
+        "id": "logo_dark",
+        "label": "Logo image (dark variant)",
+        "info": "Optional — used on light backgrounds or when header is scrolled. If omitted, the main logo is used."
+      },
+      {
+        "type": "header",
+        "content": "Favicon"
+      },
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon",
+        "info": "Recommended: 32×32px PNG or ICO"
+      }
+    ]
+  }
+]

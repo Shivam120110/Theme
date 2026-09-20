@@ -1,0 +1,461 @@
+{%- comment -%}
+  Section: hero-editorial.liquid
+  Brand: Saanjh Fine Jewellery
+  Purpose: Full-bleed editorial hero with video/image background,
+           configurable overlay, animated content block, scroll indicator.
+{%- endcomment -%}
+
+{%- liquid
+  assign text_modifier = section.settings.text_color
+  assign height_modifier = section.settings.height
+  assign overlay_opacity = section.settings.overlay_opacity | divided_by: 100.0
+-%}
+
+<section
+  class="hero-editorial hero-editorial--{{ height_modifier }} hero-editorial--text-{{ text_modifier }}"
+  id="hero-editorial-{{ section.id }}"
+  aria-label="{{ section.settings.heading_text | escape }}"
+>
+  {%- comment -%} ── Background Layer ── {%- endcomment -%}
+  <div class="hero-editorial__bg" aria-hidden="true">
+
+    {%- if section.settings.video_url != blank -%}
+      <video
+        class="hero-editorial__video"
+        src="{{ section.settings.video_url }}"
+        autoplay
+        loop
+        muted
+        playsinline
+        preload="none"
+      ></video>
+    {%- endif -%}
+
+    {%- if section.settings.hero_image != blank -%}
+      <img
+        class="hero-editorial__image{% if section.settings.video_url != blank %} hero-editorial__image--fallback{% endif %}"
+        src="{{ section.settings.hero_image | image_url: width: 2000 }}"
+        srcset="
+          {{ section.settings.hero_image | image_url: width: 800 }} 800w,
+          {{ section.settings.hero_image | image_url: width: 1200 }} 1200w,
+          {{ section.settings.hero_image | image_url: width: 1600 }} 1600w,
+          {{ section.settings.hero_image | image_url: width: 2000 }} 2000w
+        "
+        sizes="100vw"
+        alt="{{ section.settings.hero_image.alt | escape | default: section.settings.heading_text | escape }}"
+        loading="eager"
+        fetchpriority="high"
+      >
+    {%- endif -%}
+
+    {%- comment -%} Dark overlay, opacity set via CSS custom property {%- endcomment -%}
+    <div
+      class="hero-editorial__overlay"
+      style="--hero-overlay-opacity: {{ overlay_opacity }};"
+    ></div>
+  </div>
+
+  {%- comment -%} ── Content Layer ── {%- endcomment -%}
+  <div class="hero-editorial__content" data-hero-content>
+    <div class="hero-editorial__inner page-width">
+
+      {%- if section.settings.heading_text != blank -%}
+        <h1 class="hero-editorial__heading">
+          {{ section.settings.heading_text | escape }}
+        </h1>
+      {%- endif -%}
+
+      {%- if section.settings.tagline_text != blank -%}
+        <p class="hero-editorial__tagline">
+          {{ section.settings.tagline_text | escape }}
+        </p>
+      {%- endif -%}
+
+      {%- if section.settings.cta_label != blank and section.settings.cta_url != blank -%}
+        <a
+          href="{{ section.settings.cta_url }}"
+          class="btn btn--outline hero-editorial__cta"
+        >
+          {{ section.settings.cta_label | escape }}
+        </a>
+      {%- endif -%}
+
+    </div>
+  </div>
+
+  {%- comment -%} ── Scroll Indicator ── {%- endcomment -%}
+  <div class="hero-editorial__scroll-indicator" aria-hidden="true">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  </div>
+</section>
+
+{%- comment -%} ── Styles ── {%- endcomment -%}
+<style>
+  /* ─── Hero Editorial ─────────────────────────────────────── */
+
+  .hero-editorial {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    /* Height variants */
+    --hero-height-full: 100vh;
+    --hero-height-large: 85vh;
+    --hero-height-medium: 65vh;
+  }
+
+  .hero-editorial--full   { min-height: var(--hero-height-full); }
+  .hero-editorial--large  { min-height: var(--hero-height-large); }
+  .hero-editorial--medium { min-height: var(--hero-height-medium); }
+
+  /* ─── Background ─────────────────────────────────────────── */
+
+  .hero-editorial__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero-editorial__video,
+  .hero-editorial__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  /* Image is stacked beneath the video by default */
+  .hero-editorial__image { z-index: 0; }
+  .hero-editorial__video { z-index: 1; }
+
+  /* When image is pure fallback (video exists), hide image on modern browsers
+     that successfully load the video */
+  .hero-editorial__image--fallback { z-index: 0; }
+
+  .hero-editorial__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background-color: #000;
+    opacity: var(--hero-overlay-opacity, 0.3);
+  }
+
+  /* ─── Content ────────────────────────────────────────────── */
+
+  .hero-editorial__content {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .hero-editorial__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* ─── Text: Light variant (default) ─────────────────────── */
+
+  .hero-editorial--text-light .hero-editorial__heading,
+  .hero-editorial--text-light .hero-editorial__tagline {
+    color: #F7F4EF;
+  }
+
+  /* ─── Text: Dark variant ─────────────────────────────────── */
+
+  .hero-editorial--text-dark .hero-editorial__heading,
+  .hero-editorial--text-dark .hero-editorial__tagline {
+    color: var(--color-ink, #1C1B1A);
+  }
+
+  /* ─── Heading ────────────────────────────────────────────── */
+
+  .hero-editorial__heading {
+    font-family: var(--font-display, 'Cormorant Garamond', Georgia, serif);
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    line-height: 1;
+    margin: 0;
+    /* Scroll-reveal initial state */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  /* ─── Tagline ─────────────────────────────────────────────── */
+
+  .hero-editorial__tagline {
+    font-family: var(--font-body, 'Poppins', sans-serif);
+    font-size: 0.875rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0;               /* overridden post-reveal via .is-visible */
+    transform: translateY(20px);
+    margin-top: 1rem;
+    margin-bottom: 0;
+    transition: opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s;
+  }
+
+  /* ─── CTA ────────────────────────────────────────────────── */
+
+  .hero-editorial__cta {
+    margin-top: 2rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s ease 0.3s, transform 0.7s ease 0.3s;
+  }
+
+  /* Light text → white-border CTA */
+  .hero-editorial--text-light .btn--outline {
+    border-color: rgba(247, 244, 239, 0.8);
+    color: #F7F4EF;
+  }
+
+  .hero-editorial--text-light .btn--outline:hover,
+  .hero-editorial--text-light .btn--outline:focus-visible {
+    background-color: rgba(247, 244, 239, 0.12);
+    border-color: #F7F4EF;
+  }
+
+  /* Dark text → ink-border CTA */
+  .hero-editorial--text-dark .btn--outline {
+    border-color: var(--color-ink, #1C1B1A);
+    color: var(--color-ink, #1C1B1A);
+  }
+
+  .hero-editorial--text-dark .btn--outline:hover,
+  .hero-editorial--text-dark .btn--outline:focus-visible {
+    background-color: rgba(28, 27, 26, 0.08);
+  }
+
+  /* ─── Scroll Indicator ───────────────────────────────────── */
+
+  .hero-editorial__scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    color: rgba(247, 244, 239, 0.7);
+    animation: hero-scroll-bounce 2s ease-in-out infinite;
+    /* Initial reveal delay */
+    opacity: 0;
+    transition: opacity 0.7s ease 0.5s;
+  }
+
+  @keyframes hero-scroll-bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%       { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ─── Revealed State ─────────────────────────────────────── */
+
+  .hero-editorial--revealed .hero-editorial__heading {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .hero-editorial--revealed .hero-editorial__tagline {
+    opacity: 0.8;
+    transform: translateY(0);
+  }
+
+  .hero-editorial--revealed .hero-editorial__cta {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .hero-editorial--revealed .hero-editorial__scroll-indicator {
+    opacity: 1;
+  }
+
+  /* ─── Button base (global fallback if theme.css missing) ─── */
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body, 'Poppins', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.875rem 2.25rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
+
+  .btn--outline {
+    background-color: transparent;
+  }
+</style>
+
+{%- comment -%} ── Script ── {%- endcomment -%}
+<script>
+  (function () {
+    'use strict';
+
+    /**
+     * Hero Editorial — scroll-reveal on load.
+     * Uses a tiny rAF delay so CSS transitions fire correctly
+     * even when the section is at the top of the page.
+     */
+    const section = document.getElementById('hero-editorial-{{ section.id }}');
+    if (!section) return;
+
+    function revealHero() {
+      // Small rAF double-frame trick to guarantee repaint before transition
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          section.classList.add('hero-editorial--revealed');
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', revealHero);
+    } else {
+      revealHero();
+    }
+
+    /**
+     * Video: hide the fallback image once the video can play.
+     * Falls back gracefully if no video is present.
+     */
+    const video = section.querySelector('.hero-editorial__video');
+    const fallbackImg = section.querySelector('.hero-editorial__image--fallback');
+
+    if (video && fallbackImg) {
+      video.addEventListener('canplay', function onCanPlay() {
+        fallbackImg.style.visibility = 'hidden';
+        video.removeEventListener('canplay', onCanPlay);
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Hero — Editorial",
+  "tag": "section",
+  "class": "section-hero-editorial",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "url",
+      "id": "video_url",
+      "label": "Background video URL",
+      "info": "Self-hosted .mp4 or .webm. Autoplay, muted, looped."
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Background image",
+      "info": "Used as fallback when no video is set, or while video loads."
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay darkness",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "default": 30,
+      "unit": "%"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading_text",
+      "label": "Brand / Heading",
+      "default": "Saanjh"
+    },
+    {
+      "type": "text",
+      "id": "tagline_text",
+      "label": "Tagline",
+      "default": "Fine Jewellery · Crafted with Intention"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA button label",
+      "default": "Explore the Collection"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "CTA button URL"
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "select",
+      "id": "text_color",
+      "label": "Text colour",
+      "options": [
+        { "value": "light", "label": "Light (Ivory)" },
+        { "value": "dark",  "label": "Dark (Ink)" }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "Section height",
+      "options": [
+        { "value": "full",   "label": "Full viewport (100vh)" },
+        { "value": "large",  "label": "Large (85vh)" },
+        { "value": "medium", "label": "Medium (65vh)" }
+      ],
+      "default": "full"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero — Editorial",
+      "settings": {
+        "heading_text": "Saanjh",
+        "tagline_text": "Fine Jewellery · Crafted with Intention",
+        "cta_label": "Explore the Collection",
+        "overlay_opacity": 30,
+        "text_color": "light",
+        "height": "full"
+      }
+    }
+  ]
+}
+{% endschema %}

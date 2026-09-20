@@ -1,0 +1,291 @@
+{%- comment -%}
+  Section: announcement-bar.liquid
+  Brand: Saanjh Fine Jewellery
+  Purpose: Slim top announcement bar with optional link, dismiss button (sessionStorage),
+           and three background style variants.
+{%- endcomment -%}
+
+{%- liquid
+  assign bg_style = section.settings.background_style
+  assign storage_key = 'saanjh-announcement-dismissed-' | append: section.id
+-%}
+
+<div
+  class="announcement-bar announcement-bar--{{ bg_style }}"
+  id="announcement-bar-{{ section.id }}"
+  role="region"
+  aria-label="Announcement"
+  data-announcement-bar
+  data-storage-key="{{ storage_key }}"
+>
+  <div class="announcement-bar__inner">
+
+    {%- comment -%} Spacer keeps message truly centred when close btn visible {%- endcomment -%}
+    {%- if section.settings.show_close_button -%}
+      <span class="announcement-bar__spacer" aria-hidden="true"></span>
+    {%- endif -%}
+
+    <p class="announcement-bar__message">
+      {{ section.settings.message | escape }}
+
+      {%- if section.settings.link_text != blank and section.settings.link_url != blank -%}
+        <a
+          href="{{ section.settings.link_url }}"
+          class="announcement-bar__link"
+          aria-label="{{ section.settings.link_text | escape }}"
+        >
+          &nbsp;{{ section.settings.link_text | escape }}
+        </a>
+      {%- endif -%}
+    </p>
+
+    {%- if section.settings.show_close_button -%}
+      <button
+        class="announcement-bar__close"
+        aria-label="Dismiss announcement"
+        type="button"
+        data-close-announcement
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    {%- endif -%}
+
+  </div>
+</div>
+
+<style>
+  /* ─── Announcement Bar ───────────────────────────────────── */
+
+  .announcement-bar {
+    width: 100%;
+    /* Animate in/out */
+    overflow: hidden;
+    max-height: 3rem;
+    transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+  }
+
+  .announcement-bar.is-dismissed {
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* ─── Background Variants ────────────────────────────────── */
+
+  .announcement-bar--ink {
+    background-color: var(--color-ink, #1C1B1A);
+    color: var(--color-bg, #F7F4EF);
+  }
+
+  .announcement-bar--accent {
+    background-color: var(--color-accent, #B08A5A);
+    color: #fff;
+  }
+
+  .announcement-bar--surface {
+    background-color: var(--color-surface, #EFEBE3);
+    color: var(--color-ink, #1C1B1A);
+    border-bottom: 1px solid rgba(28, 27, 26, 0.1);
+  }
+
+  /* ─── Inner Layout ───────────────────────────────────────── */
+
+  .announcement-bar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55rem 1rem;
+    min-height: 2.5rem;
+    position: relative;
+  }
+
+  /* ─── Message ────────────────────────────────────────────── */
+
+  .announcement-bar__message {
+    font-family: var(--font-body, 'Poppins', sans-serif);
+    font-size: 0.6875rem;       /* 11px */
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: center;
+    margin: 0;
+    line-height: 1.4;
+    color: inherit;
+  }
+
+  /* ─── Link inside message ────────────────────────────────── */
+
+  .announcement-bar__link {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: opacity 0.2s ease;
+  }
+
+  .announcement-bar__link:hover {
+    opacity: 0.75;
+  }
+
+  /* ─── Spacer (mirrors close button width for centering) ──── */
+
+  .announcement-bar__spacer {
+    flex: 0 0 2rem;
+  }
+
+  /* ─── Close Button ───────────────────────────────────────── */
+
+  .announcement-bar__close {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.7;
+    margin-left: 0.75rem;
+    border-radius: 2px;
+    transition: opacity 0.2s ease;
+  }
+
+  .announcement-bar__close:hover,
+  .announcement-bar__close:focus-visible {
+    opacity: 1;
+    outline: none;
+  }
+
+  .announcement-bar__close:focus-visible {
+    box-shadow: 0 0 0 2px currentColor;
+  }
+
+  /* ─── Mobile ─────────────────────────────────────────────── */
+
+  @media (max-width: 600px) {
+    .announcement-bar__message {
+      font-size: 0.625rem;
+      letter-spacing: 0.06em;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    'use strict';
+
+    /**
+     * Announcement Bar — dismiss with sessionStorage persistence.
+     * The bar is hidden via the `.is-dismissed` class to allow
+     * CSS max-height animation instead of `display:none`.
+     */
+    const bar = document.getElementById('announcement-bar-{{ section.id }}');
+    if (!bar) return;
+
+    const storageKey = bar.dataset.storageKey;
+
+    // Check if user dismissed this session
+    if (storageKey && sessionStorage.getItem(storageKey) === 'true') {
+      // Remove immediately, no animation needed on page load
+      bar.style.display = 'none';
+      return;
+    }
+
+    // Wire up the close button
+    const closeBtn = bar.querySelector('[data-close-announcement]');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function () {
+        bar.classList.add('is-dismissed');
+
+        // Wait for CSS transition then remove from layout
+        bar.addEventListener('transitionend', function onEnd() {
+          bar.style.display = 'none';
+          bar.removeEventListener('transitionend', onEnd);
+        });
+
+        // Persist dismissal for this session
+        if (storageKey) {
+          try {
+            sessionStorage.setItem(storageKey, 'true');
+          } catch (_) {
+            // sessionStorage blocked (private mode edge cases) — fail silently
+          }
+        }
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Announcement Bar",
+  "tag": "div",
+  "class": "announcement-bar-wrapper",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "text",
+      "id": "message",
+      "label": "Announcement message",
+      "default": "Free shipping on orders above ₹5,000"
+    },
+    {
+      "type": "text",
+      "id": "link_text",
+      "label": "Link label",
+      "info": "Optional. Appears inline after the message."
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "Link URL"
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "select",
+      "id": "background_style",
+      "label": "Background style",
+      "options": [
+        { "value": "ink",     "label": "Dark (Ink)" },
+        { "value": "accent",  "label": "Warm Gold (Accent)" },
+        { "value": "surface", "label": "Light (Surface)" }
+      ],
+      "default": "ink"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_close_button",
+      "label": "Show dismiss button",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement Bar",
+      "settings": {
+        "message": "Free shipping on orders above ₹5,000",
+        "background_style": "ink",
+        "show_close_button": true
+      }
+    }
+  ]
+}
+{% endschema %}

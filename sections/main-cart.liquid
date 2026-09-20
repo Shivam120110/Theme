@@ -1,0 +1,313 @@
+<!-- Cart Section -->
+<div class="cart container">
+  <div class="cart__header">
+    <h1 class="cart__title">Your Bag</h1>
+    <p class="cart__count">{{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }}</p>
+  </div>
+
+  {% if cart.item_count > 0 %}
+    <form action="{{ routes.cart_url }}" method="post" class="cart__form">
+      <div class="cart__layout">
+        <!-- Cart Items -->
+        <div class="cart__items">
+          {% for item in cart.items %}
+            <div class="cart-item" data-key="{{ item.key }}">
+              <a href="{{ item.url }}" class="cart-item__image-link">
+                {% if item.image %}
+                  {{ item.image | image_url: width: 200 | image_tag: class: 'cart-item__image', alt: item.title | escape }}
+                {% endif %}
+              </a>
+              <div class="cart-item__details">
+                <p class="cart-item__vendor">{{ item.product.vendor }}</p>
+                <h3 class="cart-item__title">
+                  <a href="{{ item.url }}">{{ item.product.title }}</a>
+                </h3>
+                {% unless item.product.has_only_default_variant %}
+                  <p class="cart-item__variant">{{ item.variant.title }}</p>
+                {% endunless %}
+                <div class="cart-item__meta">
+                  <div class="cart-item__quantity">
+                    <button type="button" class="qty-btn qty-btn--minus" data-key="{{ item.key }}" aria-label="Decrease quantity">−</button>
+                    <span class="qty-value">{{ item.quantity }}</span>
+                    <button type="button" class="qty-btn qty-btn--plus" data-key="{{ item.key }}" aria-label="Increase quantity">+</button>
+                  </div>
+                  <p class="cart-item__price">{{ item.final_line_price | money }}</p>
+                </div>
+              </div>
+              <button type="button" class="cart-item__remove" data-key="{{ item.key }}" aria-label="Remove {{ item.title }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                  <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Cart Summary -->
+        <div class="cart__summary">
+          <div class="cart__summary-inner">
+            <h2 class="cart__summary-title">Order Summary</h2>
+
+            <div class="cart__subtotal">
+              <span>Subtotal</span>
+              <span>{{ cart.total_price | money }}</span>
+            </div>
+            <p class="cart__shipping-note">Shipping calculated at checkout</p>
+
+            <!-- Trust signals -->
+            <div class="cart__trust">
+              <p>✦ Free shipping on orders above ₹5,000</p>
+              <p>✦ Hallmark certified jewelry</p>
+              <p>✦ Easy 15-day returns</p>
+            </div>
+
+            <button type="submit" name="checkout" class="btn btn--primary cart__checkout">
+              Proceed to Checkout
+            </button>
+            <a href="{{ routes.collections_url }}" class="cart__continue">Continue Shopping</a>
+          </div>
+        </div>
+      </div>
+    </form>
+
+  {% else %}
+    <div class="cart__empty">
+      <p class="cart__empty-message">Your bag is empty.</p>
+      <p class="cart__empty-sub">Take your time. Browse something beautiful.</p>
+      <a href="{{ routes.collections_url }}" class="btn btn--primary">Explore Collections</a>
+    </div>
+  {% endif %}
+</div>
+
+<style>
+  .cart {
+    padding: var(--space-12) var(--grid-gutter);
+  }
+
+  .cart__header {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-4);
+    border-bottom: 1px solid rgba(28,27,26,0.1);
+    padding-bottom: var(--space-6);
+    margin-bottom: var(--space-8);
+  }
+
+  .cart__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-weight: 400;
+  }
+
+  .cart__count {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-muted);
+  }
+
+  .cart__layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: var(--space-12);
+    align-items: start;
+  }
+
+  @media (max-width: 768px) {
+    .cart__layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .cart-item {
+    display: grid;
+    grid-template-columns: 100px 1fr auto;
+    gap: var(--space-5);
+    padding: var(--space-6) 0;
+    border-bottom: 1px solid rgba(28,27,26,0.08);
+  }
+
+  .cart-item__image {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+  }
+
+  .cart-item__vendor {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .cart-item__title a {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 400;
+    color: var(--color-ink);
+  }
+
+  .cart-item__variant {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+    margin-top: var(--space-1);
+  }
+
+  .cart-item__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    margin-top: var(--space-4);
+  }
+
+  .cart-item__quantity {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .qty-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid rgba(28,27,26,0.2);
+    background: transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--color-ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color var(--transition-base), color var(--transition-base);
+  }
+
+  .qty-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .qty-value {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    min-width: 24px;
+    text-align: center;
+  }
+
+  .cart-item__price {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  .cart-item__remove {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--color-muted);
+    padding: var(--space-1);
+    transition: color var(--transition-base);
+    align-self: start;
+  }
+
+  .cart-item__remove svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .cart-item__remove:hover {
+    color: var(--color-ink);
+  }
+
+  /* Summary panel */
+  .cart__summary-inner {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    padding: var(--space-8);
+    position: sticky;
+    top: 96px;
+  }
+
+  .cart__summary-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 400;
+    margin-bottom: var(--space-6);
+  }
+
+  .cart__subtotal {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    margin-bottom: var(--space-2);
+  }
+
+  .cart__shipping-note {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+    margin-bottom: var(--space-6);
+  }
+
+  .cart__trust {
+    border-top: 1px solid rgba(28,27,26,0.1);
+    border-bottom: 1px solid rgba(28,27,26,0.1);
+    padding: var(--space-4) 0;
+    margin-bottom: var(--space-6);
+  }
+
+  .cart__trust p {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+    margin-bottom: var(--space-2);
+  }
+
+  .cart__checkout {
+    width: 100%;
+    padding: var(--space-4);
+    font-size: 0.9375rem;
+    margin-bottom: var(--space-3);
+  }
+
+  .cart__continue {
+    display: block;
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* Empty state */
+  .cart__empty {
+    text-align: center;
+    padding: var(--space-16) var(--grid-gutter);
+  }
+
+  .cart__empty-message {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 400;
+    margin-bottom: var(--space-2);
+  }
+
+  .cart__empty-sub {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--color-muted);
+    margin-bottom: var(--space-8);
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Cart",
+  "settings": []
+}
+{% endschema %}

@@ -1,0 +1,21 @@
+# Normalize line endings for all text-based Shopify theme files
+* text=auto eol=lf
+
+# Liquid templates
+*.liquid text eol=lf
+*.json   text eol=lf
+*.css    text eol=lf
+*.js     text eol=lf
+*.md     text eol=lf
+*.yml    text eol=lf
+
+# Binary assets (if added later)
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.woff   binary
+*.woff2  binary
+*.ttf    binary
+*.otf    binary

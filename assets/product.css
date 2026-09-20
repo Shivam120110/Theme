@@ -1,0 +1,989 @@
+/* ==========================================================================
+   product.css
+   Saanjh Shopify Theme — Product page split layout, media gallery,
+   variant selectors, trust signals, accordions.
+   ========================================================================== */
+
+/* ─── Local Token Defaults ────────────────────────────────────────────────── */
+:root {
+  --color-bg:        #F7F4EF;
+  --color-ink:       #1C1B1A;
+  --color-accent:    #B08A5A;
+  --color-surface:   #EFEBE3;
+  --color-muted:     #8A8680;
+  --color-cta:       #8B2635;
+  --color-border:    rgba(28, 27, 26, 0.12);
+
+  --font-display:    'Cormorant Garamond', Georgia, serif;
+  --font-body:       'Poppins', system-ui, sans-serif;
+
+  --radius-sm:       4px;
+  --radius-md:       8px;
+  --radius-lg:       16px;
+  --radius-pill:     999px;
+
+  --transition-base: 300ms ease;
+  --container-max:   1280px;
+  --container-pad:   clamp(1rem, 4vw, 2.5rem);
+}
+
+/* ─── Utility ─────────────────────────────────────────────────────────────── */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ─── Product Page Layout ─────────────────────────────────────────────────── */
+/*
+  Expected template structure:
+    <div class="product-page container">
+      <section class="product-media-section">  (product-media.liquid)
+      <div class="product-info-section">       (product-info.liquid)
+    </div>
+*/
+.product-page {
+  display: grid;
+  grid-template-columns: 55% 1fr;
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: start;
+  padding-block: 2.5rem;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  .product-page {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+/* ─── Product Media Section ───────────────────────────────────────────────── */
+.product-media-section {
+  /* Sticky on desktop so gallery travels with scroll */
+  position: sticky;
+  top: calc(var(--header-height, 64px) + 1rem);
+}
+
+@media (max-width: 900px) {
+  .product-media-section {
+    position: static;
+  }
+}
+
+/* ── Media Tabs (Photos / 360°) ── */
+.product-media__tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 1rem;
+}
+
+.product-media__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.625rem 1.25rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition:
+    color        var(--transition-base),
+    border-color var(--transition-base);
+  margin-bottom: -1px; /* overlap container border */
+}
+
+.product-media__tab:hover {
+  color: var(--color-ink);
+}
+
+.product-media__tab--active {
+  color: var(--color-ink);
+  border-bottom-color: var(--color-accent);
+}
+
+.product-media__tab svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+}
+
+/* ── Panel ── */
+.product-media__panel {
+  display: block;
+}
+
+.product-media__panel--hidden {
+  display: none;
+}
+
+/* ── Main Image Container ── */
+.product-media__main-wrap {
+  position: relative;
+  overflow: hidden;                 /* Clip zoom scale */
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  aspect-ratio: 1 / 1;
+  cursor: zoom-in;
+}
+
+/* On zoom, scale the inner image — JS adds .is-zoomed class */
+.product-media__main-wrap.is-zoomed .product-media__img {
+  transform: scale(1.05);
+}
+
+/* Individual main image slides */
+.product-media__main-image {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-media__main-image--active {
+  opacity: 1;
+  position: relative;  /* Active image participates in layout */
+}
+
+/* The <img> itself */
+.product-media__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 500ms ease;
+  user-select: none;
+}
+
+/* Video / model embeds */
+.product-media__video,
+.product-media__model {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* No-media placeholder */
+.product-media__placeholder {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  color: var(--color-muted);
+}
+
+.product-media__placeholder svg {
+  width: 64px;
+  height: 64px;
+  opacity: 0.4;
+}
+
+/* Zoom hint badge */
+.product-media__zoom-hint {
+  position: absolute;
+  bottom: 0.875rem;
+  right: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(247, 244, 239, 0.88);
+  border-radius: var(--radius-pill);
+  padding: 0.25rem 0.625rem;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  color: var(--color-muted);
+  pointer-events: none;
+  transition: opacity var(--transition-base);
+  backdrop-filter: blur(4px);
+}
+
+.product-media__zoom-hint svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Hide hint once user has hovered */
+.product-media__main-wrap.is-zoomed .product-media__zoom-hint,
+.product-media__main-wrap.hint-dismissed .product-media__zoom-hint {
+  opacity: 0;
+}
+
+/* ── Thumbnail Strip ── */
+.product-media__thumbs {
+  display: flex;
+  gap: 0.625rem;
+  margin-top: 0.875rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;          /* Firefox */
+  padding-bottom: 4px;            /* Room for focus ring */
+}
+
+.product-media__thumbs::-webkit-scrollbar {
+  display: none;
+}
+
+.product-media__thumb {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-surface);
+  cursor: pointer;
+  padding: 0;
+  scroll-snap-align: start;
+  transition: border-color var(--transition-base);
+}
+
+.product-media__thumb:hover {
+  border-color: var(--color-muted);
+}
+
+.product-media__thumb--active {
+  border-color: var(--color-accent);
+}
+
+.product-media__thumb:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.product-media__thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+/* ── Thumbnail Side Position ── */
+.product-media--thumb-side {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 0.875rem;
+}
+
+.product-media--thumb-side .product-media__main-wrap {
+  flex: 1;
+}
+
+.product-media--thumb-side .product-media__thumbs {
+  flex-direction: column;
+  width: 72px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 0;
+  padding-bottom: 0;
+  scroll-snap-type: y mandatory;
+}
+
+.product-media--thumb-side .product-media__thumb {
+  scroll-snap-align: start;
+}
+
+/* ── 360° Embed ── */
+.product-media__spin-wrap {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.product-media__spin-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* ─── Product Info Section ────────────────────────────────────────────────── */
+.product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Breadcrumb ── */
+.product-info__breadcrumb {
+  margin-bottom: 1.25rem;
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.breadcrumb__link {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--color-muted);
+  text-decoration: none;
+  transition: color var(--transition-base);
+}
+
+.breadcrumb__link:hover {
+  color: var(--color-accent);
+}
+
+.breadcrumb__sep {
+  display: flex;
+  align-items: center;
+  color: var(--color-muted);
+  opacity: 0.5;
+}
+
+.breadcrumb__sep svg {
+  width: 12px;
+  height: 12px;
+}
+
+.breadcrumb__item[aria-current="page"] {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--color-ink);
+}
+
+/* ── Title ── */
+.product-info__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3vw, 2rem);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  color: var(--color-ink);
+  margin: 0 0 1rem;
+}
+
+/* ── Price ── */
+.product-info__price-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.product-info__price {
+  font-family: var(--font-body);
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  letter-spacing: -0.01em;
+}
+
+.product-info__price--on-sale {
+  color: var(--color-cta);
+}
+
+.product-info__compare-price {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+.product-info__compare-price--hidden {
+  display: none;
+}
+
+.product-info__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.5rem;
+  background: var(--color-cta);
+  color: #fff;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* ── Trust Signals ── */
+.trust-signals {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.trust-signals__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--color-muted);
+  line-height: 1.4;
+}
+
+.trust-signals__item svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  stroke: var(--color-accent);
+}
+
+/* ── Variant Groups ── */
+.product-variants {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.variant-group {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.variant-group__legend {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 0.625rem;
+  display: flex;
+  gap: 0.4rem;
+  align-items: baseline;
+}
+
+.variant-group__selected {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--color-ink);
+}
+
+.variant-group__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* ── Pill (generic) variant option ── */
+.variant-option {
+  position: relative;
+  cursor: pointer;
+}
+
+.variant-option__input {
+  /* Visually hidden but accessible */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.variant-option__label {
+  display: block;
+}
+
+/* Pill style */
+.variant-option--pill .variant-option__label,
+.variant-option--pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.875rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--color-ink);
+  background: var(--color-bg);
+  transition:
+    border-color     var(--transition-base),
+    background-color var(--transition-base),
+    color            var(--transition-base);
+}
+
+.variant-option--pill:hover .variant-option__label,
+.variant-option--pill:hover {
+  border-color: var(--color-accent);
+}
+
+.variant-option--pill.variant-option--selected .variant-option__label,
+.variant-option--pill.variant-option--selected {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #fff;
+}
+
+/* Metal swatch variant option */
+.variant-option--metal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border: 2px solid transparent;
+  border-radius: var(--radius-pill);
+  background: var(--color-bg);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--color-ink);
+  transition:
+    border-color     var(--transition-base),
+    background-color var(--transition-base);
+}
+
+.variant-option--metal:hover {
+  border-color: var(--color-muted);
+}
+
+.variant-option--metal.variant-option--selected {
+  border-color: var(--color-accent);
+  background: rgba(176, 138, 90, 0.08);
+}
+
+/* Metal swatches */
+.variant-swatch {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(28, 27, 26, 0.15);
+  flex-shrink: 0;
+}
+
+.variant-swatch--rose-gold {
+  background: linear-gradient(135deg, #E8B4A0, #C97B5B);
+}
+
+.variant-swatch--yellow-gold {
+  background: linear-gradient(135deg, #F5D68B, #C8A84B);
+}
+
+.variant-swatch--white-gold {
+  background: linear-gradient(135deg, #F0F0F0, #C8C8C8);
+}
+
+.variant-swatch--silver {
+  background: linear-gradient(135deg, #E8E8E8, #A8A8A8);
+}
+
+.variant-swatch--default {
+  background: var(--color-muted);
+}
+
+/* Stone variant option */
+.variant-option--stone {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--color-ink);
+  transition: border-color var(--transition-base);
+}
+
+.variant-option--stone:hover {
+  border-color: var(--color-muted);
+}
+
+.variant-option--stone.variant-option--selected {
+  border-color: var(--color-accent);
+}
+
+.variant-stone {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+/* Focus ring for all variant labels */
+.variant-option__input:focus-visible + .variant-option__label,
+.variant-option:has(.variant-option__input:focus-visible) {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Quantity Stepper ── */
+.product-quantity {
+  margin-bottom: 1.25rem;
+}
+
+.product-quantity__label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.product-quantity__stepper {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  height: 44px;
+}
+
+.product-quantity__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-ink);
+  transition: background-color var(--transition-base);
+}
+
+.product-quantity__btn:hover {
+  background: var(--color-surface);
+}
+
+.product-quantity__btn:active {
+  background: var(--color-border);
+}
+
+.product-quantity__btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.product-quantity__input {
+  width: 52px;
+  text-align: center;
+  border: none;
+  border-inline: 1px solid var(--color-border);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  background: transparent;
+  -moz-appearance: textfield;
+}
+
+.product-quantity__input::-webkit-inner-spin-button,
+.product-quantity__input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+.product-quantity__input:focus-visible {
+  outline: none;
+  background: var(--color-surface);
+}
+
+/* ── Add to Bag ── */
+.product-actions {
+  margin-bottom: 1.75rem;
+}
+
+.btn-add-to-bag {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    background-color var(--transition-base),
+    transform        150ms ease;
+}
+
+.btn-add-to-bag:hover:not(:disabled) {
+  background: #9a7848;
+}
+
+.btn-add-to-bag:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.btn-add-to-bag:disabled,
+.btn-add-to-bag[aria-disabled="true"] {
+  background: var(--color-muted);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.btn-add-to-bag:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* Loader spinner — shown via JS during AJAX */
+.btn-add-to-bag__loader {
+  position: absolute;
+  right: 1.25rem;
+  display: none;
+  align-items: center;
+}
+
+.btn-add-to-bag.is-loading .btn-add-to-bag__loader {
+  display: flex;
+}
+
+.btn-add-to-bag.is-loading .btn-add-to-bag__text {
+  opacity: 0.5;
+}
+
+.btn-add-to-bag__loader svg {
+  width: 18px;
+  height: 18px;
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Cart feedback message */
+.product-actions__feedback {
+  margin-top: 0.625rem;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--color-muted);
+  min-height: 1.2em;
+  text-align: center;
+  transition: color var(--transition-base);
+}
+
+.product-actions__feedback.is-success {
+  color: #4a7c59;
+}
+
+.product-actions__feedback.is-error {
+  color: var(--color-cta);
+}
+
+/* ── Product Accordions ── */
+.product-accordions {
+  border-top: 1px solid var(--color-border);
+  margin-bottom: 1.75rem;
+}
+
+.product-accordion {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.product-accordion__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.product-accordion__summary::-webkit-details-marker { display: none; }
+.product-accordion__summary::marker { display: none; }
+
+.product-accordion__title {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  letter-spacing: 0.02em;
+  transition: color var(--transition-base);
+}
+
+.product-accordion__summary:hover .product-accordion__title {
+  color: var(--color-accent);
+}
+
+.product-accordion__icon {
+  display: flex;
+  align-items: center;
+  color: var(--color-muted);
+  transition: transform var(--transition-base);
+}
+
+.product-accordion__icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.product-accordion[open] .product-accordion__icon {
+  transform: rotate(180deg);
+}
+
+.product-accordion__body {
+  animation: accordionReveal 250ms ease;
+  overflow: hidden;
+}
+
+@keyframes accordionReveal {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.product-accordion__content {
+  padding-bottom: 1.25rem;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--color-muted);
+  line-height: 1.7;
+}
+
+.product-accordion__content p { margin: 0 0 0.75em; }
+.product-accordion__content p:last-child { margin-bottom: 0; }
+
+/* Editorial (Styling Notes) — Cormorant italic */
+.product-accordion__content--editorial {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.0625rem;
+  color: var(--color-ink);
+  line-height: 1.65;
+}
+
+/* Product details definition list */
+.product-details-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-bottom: 1.25rem;
+}
+
+.product-details-list__row {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.product-details-list__term {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.product-details-list__desc {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+/* ── Share Links ── */
+.product-share {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.product-share__label {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.product-share__links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.product-share__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  color: var(--color-muted);
+  text-decoration: none;
+  background: none;
+  cursor: pointer;
+  transition:
+    border-color     var(--transition-base),
+    color            var(--transition-base),
+    background-color var(--transition-base);
+}
+
+.product-share__link:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: rgba(176, 138, 90, 0.06);
+}
+
+.product-share__link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.product-share__link svg {
+  width: 15px;
+  height: 15px;
+}

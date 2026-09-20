@@ -1,0 +1,176 @@
+{%- comment -%}
+  ============================================================
+  Snippet: product-card.liquid
+  Usage:   {% render 'product-card', product: product, lazy: true %}
+
+  Parameters
+  ----------
+  product  {Object}  Required. A Shopify product object.
+  lazy     {Boolean} Optional. Whether images use lazy loading.
+                     Defaults to true. Pass false for above-the-fold cards.
+  ============================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign lazy_loading = 'lazy'
+  if lazy == false
+    assign lazy_loading = 'eager'
+  endif
+-%}
+
+<style>
+  /*
+   * --------------------------------------------------------
+   * Product Card — Saanjh theme
+   * Relies on CSS custom properties defined in base.css:
+   *   --color-bg, --color-ink, --color-accent,
+   *   --color-surface, --color-muted,
+   *   --font-display, --font-body,
+   *   --space-3 (e.g. 0.75rem)
+   * --------------------------------------------------------
+   */
+
+  .product-card {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-bg);
+    /* Lift transition handled via transform on hover below */
+    transition: transform 300ms ease, box-shadow 300ms ease;
+  }
+
+  .product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(28, 27, 26, 0.08);
+  }
+
+  /* ── Media wrapper ── */
+  .product-card__media-link {
+    display: block;
+    text-decoration: none;
+    /* Contain the absolutely positioned secondary image */
+    position: relative;
+  }
+
+  .product-card__media {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background-color: var(--color-surface);
+  }
+
+  /* ── Images ── */
+  .product-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 400ms ease;
+    display: block;
+  }
+
+  /* Secondary image sits absolutely over the primary */
+  .product-card__image--secondary {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+
+  /* Swap images on hover */
+  .product-card:hover .product-card__image--primary {
+    opacity: 0;
+  }
+
+  .product-card:hover .product-card__image--secondary {
+    opacity: 1;
+  }
+
+  /* ── Info block ── */
+  .product-card__info {
+    padding: var(--space-3) 0 0;
+  }
+
+  .product-card__title {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.4;
+    margin: 0 0 0.25rem;
+    letter-spacing: 0.01em;
+  }
+
+  .product-card__title a {
+    color: var(--color-ink);
+    text-decoration: none;
+    /* Extend click area across the full card info */
+    /* (Full card linking done via the media link; title link is supplementary) */
+  }
+
+  .product-card__title a:hover {
+    color: var(--color-accent);
+  }
+
+  .product-card__price {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-muted);
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+</style>
+
+<article class="product-card">
+  {%- comment %} ── Media link wraps the image area ── {% endcomment %}
+  <a
+    href="{{ product.url }}"
+    class="product-card__media-link"
+    aria-label="{{ product.title | escape }}"
+    tabindex="0"
+  >
+    <div class="product-card__media">
+
+      {%- comment %} Primary image — eager or lazy based on `lazy` param {%- endcomment %}
+      {%- if product.featured_media -%}
+        {{
+          product.featured_media
+          | image_url: width: 800
+          | image_tag:
+            loading: lazy_loading,
+            class: 'product-card__image product-card__image--primary',
+            alt: product.featured_media.alt | escape,
+            width: product.featured_media.width,
+            height: product.featured_media.height
+        }}
+      {%- endif -%}
+
+      {%- comment %} Secondary / hover image — always lazy since it's hidden on load {%- endcomment %}
+      {%- assign second_media = product.media[1] -%}
+      {%- if second_media -%}
+        {{
+          second_media
+          | image_url: width: 800
+          | image_tag:
+            loading: 'lazy',
+            class: 'product-card__image product-card__image--secondary',
+            alt: second_media.alt | escape,
+            width: second_media.width,
+            height: second_media.height
+        }}
+      {%- endif -%}
+
+    </div>
+  </a>
+
+  {%- comment %} ── Text info below image ── {% endcomment %}
+  <div class="product-card__info">
+    <h3 class="product-card__title">
+      <a href="{{ product.url }}">{{ product.title }}</a>
+    </h3>
+    <p class="product-card__price">
+      {%- if product.price_varies -%}
+        {{ 'products.product.from_price' | t }}
+        {{ product.price_min | money }}
+      {%- else -%}
+        {{ product.price | money }}
+      {%- endif -%}
+    </p>
+  </div>
+</article>

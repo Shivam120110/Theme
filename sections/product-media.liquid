@@ -1,0 +1,232 @@
+{% comment %}
+  Section: product-media.liquid
+  Purpose: Product page left panel — high-res image gallery, thumbnail strip,
+           hover zoom, optional 360° spin embed.
+  Brand: Saanjh — unhurried, luxurious visual experience.
+{% endcomment %}
+
+<link rel="stylesheet" href="{{ 'product.css' | asset_url }}" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="{{ 'product.css' | asset_url }}"></noscript>
+
+{%- assign first_media = product.media | first -%}
+{%- assign spin_url    = product.metafields.custom.spin_embed_url.value -%}
+{%- assign has_360     = section.settings.enable_360 | and: spin_url -%}
+
+<div
+  class="product-media{% if section.settings.thumbnail_position == 'side' %} product-media--thumb-side{% endif %}"
+  id="ProductMedia"
+  data-product-media
+  data-enable-zoom="{{ section.settings.enable_zoom }}"
+>
+
+  {%- comment -%} ── Tab Bar (Main / 360°) ── {%- endcomment -%}
+  {% if has_360 %}
+    <div class="product-media__tabs" role="tablist" aria-label="Product view options">
+      <button
+        id="TabPhotos"
+        class="product-media__tab product-media__tab--active"
+        role="tab"
+        aria-selected="true"
+        aria-controls="PanelPhotos"
+        data-media-tab="photos"
+        type="button"
+      >
+        Photos
+      </button>
+      <button
+        id="Tab360"
+        class="product-media__tab"
+        role="tab"
+        aria-selected="false"
+        aria-controls="Panel360"
+        data-media-tab="360"
+        type="button"
+      >
+        {% render 'icon-rotate-3d' %}
+        360° View
+      </button>
+    </div>
+  {% endif %}
+
+  {%- comment -%} ── Main Image Panel ── {%- endcomment -%}
+  <div
+    id="PanelPhotos"
+    class="product-media__panel"
+    role="tabpanel"
+    aria-labelledby="TabPhotos"
+    data-media-panel="photos"
+  >
+
+    {%- comment -%} Main image container — zoom triggered by JS class {%- endcomment -%}
+    <div
+      class="product-media__main-wrap"
+      data-media-main-wrap
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      {% if product.media.size > 0 %}
+        {% for media in product.media %}
+          <div
+            class="product-media__main-image{% if forloop.first %} product-media__main-image--active{% endif %}"
+            data-media-main-image
+            data-media-id="{{ media.id }}"
+            aria-hidden="{% if forloop.first %}false{% else %}true{% endif %}"
+          >
+            {% if media.media_type == 'image' %}
+              <img
+                src="{{ media | image_url: width: 900 }}"
+                srcset="
+                  {{ media | image_url: width: 600  }} 600w,
+                  {{ media | image_url: width: 900  }} 900w,
+                  {{ media | image_url: width: 1200 }} 1200w
+                "
+                sizes="(max-width: 768px) 100vw, 55vw"
+                alt="{{ media.alt | default: product.title | escape }}"
+                width="{{ media.width }}"
+                height="{{ media.height }}"
+                loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                fetchpriority="{% if forloop.first %}high{% else %}auto{% endif %}"
+                class="product-media__img"
+                draggable="false"
+              >
+            {% elsif media.media_type == 'video' %}
+              {{
+                media
+                | media_tag:
+                  image_size: '900x',
+                  loop: true,
+                  controls: true,
+                  class: 'product-media__video'
+              }}
+            {% elsif media.media_type == 'external_video' %}
+              {{
+                media
+                | media_tag:
+                  image_size: '900x',
+                  loop: true,
+                  class: 'product-media__video'
+              }}
+            {% elsif media.media_type == 'model' %}
+              {{
+                media
+                | media_tag:
+                  image_size: '900x',
+                  reveal: 'interaction',
+                  class: 'product-media__model'
+              }}
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        {%- comment -%} No media placeholder {%- endcomment -%}
+        <div class="product-media__placeholder" aria-label="No image available">
+          {% render 'icon-image-placeholder' %}
+        </div>
+      {% endif %}
+
+      {%- comment -%} Zoom hint badge (visible before first interaction) {%- endcomment -%}
+      {% if section.settings.enable_zoom %}
+        <span class="product-media__zoom-hint" aria-hidden="true" data-zoom-hint>
+          {% render 'icon-zoom-in' %}
+          Hover to zoom
+        </span>
+      {% endif %}
+    </div>
+
+    {%- comment -%} ── Thumbnail Strip ── {%- endcomment -%}
+    {% if product.media.size > 1 %}
+      <div
+        class="product-media__thumbs"
+        role="list"
+        aria-label="Product image thumbnails"
+        data-media-thumbs
+      >
+        {% for media in product.media %}
+          <button
+            class="product-media__thumb{% if forloop.first %} product-media__thumb--active{% endif %}"
+            role="listitem"
+            type="button"
+            aria-label="View image {{ forloop.index }}: {{ media.alt | default: product.title | escape }}"
+            aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+            data-media-thumb
+            data-media-id="{{ media.id }}"
+          >
+            <img
+              src="{{ media | image_url: width: 120 }}"
+              alt="{{ media.alt | default: product.title | escape }}"
+              width="120"
+              height="120"
+              loading="lazy"
+              class="product-media__thumb-img"
+              draggable="false"
+            >
+          </button>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+  </div>
+
+  {%- comment -%} ── 360° View Panel ── {%- endcomment -%}
+  {% if has_360 %}
+    <div
+      id="Panel360"
+      class="product-media__panel product-media__panel--360 product-media__panel--hidden"
+      role="tabpanel"
+      aria-labelledby="Tab360"
+      data-media-panel="360"
+    >
+      <div class="product-media__spin-wrap">
+        <iframe
+          class="product-media__spin-frame"
+          src="{{ spin_url | escape }}"
+          title="360 degree view of {{ product.title | escape }}"
+          allowfullscreen
+          loading="lazy"
+          frameborder="0"
+        ></iframe>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+<script src="{{ 'product.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Product Media",
+  "tag": "div",
+  "class": "product-media-section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_zoom",
+      "label": "Enable image zoom on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_360",
+      "label": "Enable 360° view tab (requires metafield)",
+      "default": true,
+      "info": "Add the spin embed URL to product metafield: custom.spin_embed_url"
+    },
+    {
+      "type": "select",
+      "id": "thumbnail_position",
+      "label": "Thumbnail position",
+      "options": [
+        { "value": "below", "label": "Below main image" },
+        { "value": "side",  "label": "Left side" }
+      ],
+      "default": "below"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Media"
+    }
+  ]
+}
+{% endschema %}

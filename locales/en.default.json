@@ -1,0 +1,96 @@
+{
+  "general": {
+    "accessibility": {
+      "skip_to_content": "Skip to content"
+    },
+    "currency": {
+      "in": "₹"
+    }
+  },
+  "sections": {
+    "header": {
+      "announcement": "Announcement",
+      "cart": "Cart",
+      "cart_count": {
+        "one": "{{ count }} item",
+        "other": "{{ count }} items"
+      },
+      "search": "Search",
+      "wishlist": "Wishlist",
+      "mobile_menu": "Menu"
+    },
+    "footer": {
+      "newsletter": {
+        "label": "Email address",
+        "submit": "Subscribe",
+        "success": "Thank you for subscribing.",
+        "error": "Something went wrong. Please try again."
+      }
+    }
+  },
+  "products": {
+    "product": {
+      "add_to_bag": "Add to Bag",
+      "sold_out": "Sold Out",
+      "unavailable": "Unavailable",
+      "price": {
+        "from": "From",
+        "sale_badge": "Sale"
+      },
+      "quantity": {
+        "label": "Quantity",
+        "increase": "Increase quantity",
+        "decrease": "Decrease quantity"
+      },
+      "share": "Share",
+      "styling_notes": "Styling Notes",
+      "product_details": "Product Details",
+      "care": "Care & Maintenance"
+    }
+  },
+  "collections": {
+    "sorting": {
+      "label": "Sort by",
+      "featured": "Featured",
+      "price_ascending": "Price: Low to High",
+      "price_descending": "Price: High to Low",
+      "title_ascending": "A–Z",
+      "title_descending": "Z–A",
+      "created_ascending": "Oldest",
+      "created_descending": "Newest"
+    },
+    "filters": {
+      "title": "Filters",
+      "clear_all": "Clear all",
+      "apply": "Apply",
+      "active_filters": "Active filters",
+      "price_range": {
+        "from": "From",
+        "to": "To"
+      }
+    },
+    "empty": "Nothing here yet — check back soon."
+  },
+  "cart": {
+    "title": "Your Bag",
+    "empty": {
+      "heading": "Your bag is empty.",
+      "subtext": "Take your time. Browse something beautiful."
+    },
+    "checkout": "Proceed to Checkout",
+    "continue_shopping": "Continue Shopping",
+    "subtotal": "Subtotal",
+    "shipping_note": "Shipping calculated at checkout",
+    "trust": {
+      "free_shipping": "Free shipping on orders above ₹5,000",
+      "hallmark": "Hallmark certified jewelry",
+      "returns": "Easy 15-day returns"
+    }
+  },
+  "errors": {
+    "404": {
+      "heading": "This page has moved on.",
+      "body": "The piece you're looking for may have sold out, moved, or never existed here. Let us guide you back to something beautiful."
+    }
+  }
+}

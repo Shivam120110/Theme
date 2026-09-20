@@ -1,0 +1,312 @@
+{%- comment -%}
+  Section: editors-picks.liquid
+  Brand: Saanjh Fine Jewellery
+  Purpose: Featured product carousel / grid — Cormorant heading, product-card
+           snippet, CSS scroll-snap carousel on mobile, 4-col grid desktop.
+{%- endcomment -%}
+
+<section
+  class="editors-picks"
+  id="editors-picks-{{ section.id }}"
+  aria-labelledby="ep-heading-{{ section.id }}"
+>
+  <div class="page-width">
+
+    {%- comment -%} ── Section Header ── {%- endcomment -%}
+    <header class="editors-picks__header">
+      {%- if section.settings.section_label != blank -%}
+        <p class="editors-picks__label" aria-hidden="true">
+          {{ section.settings.section_label | escape }}
+        </p>
+      {%- endif -%}
+
+      {%- if section.settings.section_heading != blank -%}
+        <h2
+          class="editors-picks__heading"
+          id="ep-heading-{{ section.id }}"
+        >
+          {{ section.settings.section_heading | escape }}
+        </h2>
+      {%- endif -%}
+    </header>
+
+    {%- comment -%} ── Product Carousel / Grid ── {%- endcomment -%}
+    {%- if section.settings.products != blank -%}
+      <div
+        class="editors-picks__track"
+        role="list"
+        aria-label="{{ section.settings.section_label | escape | default: 'Editor\'s Picks' }}"
+      >
+        {%- for product in section.settings.products limit: 8 -%}
+          <div class="editors-picks__item" role="listitem">
+            {%- render 'product-card', product: product -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      {%- comment -%} Editor placeholder shown in theme editor {%- endcomment -%}
+      <div class="editors-picks__track" role="list">
+        {%- for i in (1..4) -%}
+          <div class="editors-picks__item editors-picks__item--placeholder" role="listitem">
+            <div class="editors-picks__placeholder-img">
+              {{ 'product-' | append: i | placeholder_svg_tag: 'placeholder-svg' }}
+            </div>
+            <p class="editors-picks__placeholder-title">Product Name</p>
+            <p class="editors-picks__placeholder-price">₹0,000</p>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} ── View All ── {%- endcomment -%}
+    {%- if section.settings.cta_label != blank and section.settings.cta_url != blank -%}
+      <div class="editors-picks__footer">
+        <a
+          href="{{ section.settings.cta_url }}"
+          class="editors-picks__cta"
+          aria-label="{{ section.settings.cta_label | escape }}"
+        >
+          {{ section.settings.cta_label | escape }}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+<style>
+  /* ─── Editor's Picks ─────────────────────────────────────── */
+
+  .editors-picks {
+    padding: var(--section-padding-y, 5rem) 0;
+    background-color: var(--color-bg, #F7F4EF);
+  }
+
+  /* ─── Header ─────────────────────────────────────────────── */
+
+  .editors-picks__header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  /* Small-caps eyebrow label */
+  .editors-picks__label {
+    font-family: var(--font-body, 'Poppins', sans-serif);
+    font-size: 0.6875rem;        /* 11px */
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-accent, #B08A5A);
+    margin: 0 0 0.625rem;
+  }
+
+  .editors-picks__heading {
+    font-family: var(--font-display, 'Cormorant Garamond', Georgia, serif);
+    font-size: clamp(1.75rem, 3vw, 2.75rem);
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    color: var(--color-ink, #1C1B1A);
+    margin: 0;
+    line-height: 1.15;
+  }
+
+  /* ─── Track ──────────────────────────────────────────────── */
+
+  .editors-picks__track {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  /* ─── Individual Item ────────────────────────────────────── */
+
+  .editors-picks__item {
+    min-width: 0;               /* prevent grid blowout */
+  }
+
+  /* ─── Placeholder (editor/no-products state) ─────────────── */
+
+  .editors-picks__item--placeholder {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .editors-picks__placeholder-img {
+    aspect-ratio: 3 / 4;
+    background-color: var(--color-surface, #EFEBE3);
+    overflow: hidden;
+  }
+
+  .editors-picks__placeholder-img .placeholder-svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .editors-picks__placeholder-title,
+  .editors-picks__placeholder-price {
+    font-family: var(--font-body, 'Poppins', sans-serif);
+    font-size: 0.8125rem;
+    color: var(--color-muted, #8A8680);
+    margin: 0;
+  }
+
+  /* ─── Footer / CTA ───────────────────────────────────────── */
+
+  .editors-picks__footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2.5rem;
+  }
+
+  .editors-picks__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-body, 'Poppins', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--color-ink, #1C1B1A);
+    transition: color 0.3s ease, gap 0.3s ease;
+  }
+
+  .editors-picks__cta:hover,
+  .editors-picks__cta:focus-visible {
+    color: var(--color-accent, #B08A5A);
+    gap: 0.75rem;
+    outline: none;
+  }
+
+  .editors-picks__cta svg {
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+  }
+
+  .editors-picks__cta:hover svg,
+  .editors-picks__cta:focus-visible svg {
+    transform: translateX(3px);
+  }
+
+  /* ─── Responsive — Tablet (≤ 900px) ─────────────────────── */
+
+  @media (max-width: 900px) {
+    .editors-picks__track {
+      grid-template-columns: unset;
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      gap: 1rem;
+      /* Negative side padding so cards peek at edges */
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      margin-left: -1.5rem;
+      margin-right: -1.5rem;
+      scrollbar-width: none;
+    }
+
+    .editors-picks__track::-webkit-scrollbar {
+      display: none;
+    }
+
+    .editors-picks__item {
+      flex: 0 0 auto;
+      width: clamp(220px, 55vw, 280px);
+      scroll-snap-align: start;
+    }
+  }
+
+  /* ─── Responsive — Mobile (≤ 600px) ─────────────────────── */
+
+  @media (max-width: 600px) {
+    .editors-picks {
+      padding: 3.5rem 0;
+    }
+
+    .editors-picks__header {
+      margin-bottom: 2rem;
+    }
+
+    .editors-picks__item {
+      width: clamp(200px, 72vw, 260px);
+    }
+
+    .editors-picks__footer {
+      justify-content: center;
+      margin-top: 2rem;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Editor's Picks",
+  "tag": "section",
+  "class": "section-editors-picks",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_label",
+      "label": "Eyebrow label",
+      "default": "Editor's Picks",
+      "info": "Small uppercase text above the heading."
+    },
+    {
+      "type": "text",
+      "id": "section_heading",
+      "label": "Section heading",
+      "default": "Thoughtfully Selected"
+    },
+    {
+      "type": "product_list",
+      "id": "products",
+      "label": "Products",
+      "limit": 8
+    },
+    {
+      "type": "header",
+      "content": "Call to action"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Link label",
+      "default": "View All"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Link URL"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Editor's Picks",
+      "settings": {
+        "section_label": "Editor's Picks",
+        "section_heading": "Thoughtfully Selected",
+        "cta_label": "View All"
+      }
+    }
+  ]
+}
+{% endschema %}

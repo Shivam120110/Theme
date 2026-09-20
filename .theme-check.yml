@@ -1,0 +1,38 @@
+TemplateLength:
+  enabled: true
+  threshold: 200
+
+MissingTemplate:
+  enabled: true
+
+UnknownFilter:
+  enabled: true
+
+UnusedAssign:
+  enabled: true
+
+LiquidTag:
+  enabled: true
+
+SyntaxError:
+  enabled: true
+
+DeprecatedFilter:
+  enabled: true
+
+AssetSizeCSS:
+  enabled: true
+  threshold_in_bytes: 100000
+
+AssetSizeJavaScript:
+  enabled: true
+  threshold_in_bytes: 150000
+
+HtmlParsingError:
+  enabled: true
+
+MatchingSchemaTranslations:
+  enabled: true
+
+RemoteAsset:
+  enabled: false

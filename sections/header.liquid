@@ -1,0 +1,396 @@
+{%- comment -%}
+  sections/header.liquid
+  ──────────────────────────────────────────────────────────────────────────────
+  Saanjh — Site Header (Shopify 2.0)
+
+  Renders:
+    • Optional announcement bar (toggled via schema)
+    • Sticky site header with:
+        – Left  : logo (image or logotype)
+        – Center: primary nav (linklists['main-menu'], icon-mapped per title)
+        – Right : utility icons (search, wishlist, cart with count badge)
+    • Mobile off-canvas drawer (slides from left)
+    • Overlay backdrop for drawer
+
+  JS entry : assets/header.js
+  CSS entry: assets/header.css (loaded via layout/theme.liquid)
+{%- endcomment -%}
+
+{%- liquid
+  assign sticky        = section.settings.sticky
+  assign transparent   = section.settings.transparent_on_hero
+  assign logo_image    = section.settings.logo_image
+  assign logo_width    = section.settings.logo_width
+  assign show_announce = section.settings.show_announcement
+  assign announce_text = section.settings.announcement_text
+  assign announce_url  = section.settings.announcement_url
+  assign nav_linklist  = linklists['main-menu']
+-%}
+
+{%- comment -%} ── Announcement Bar ───────────────────────────────────────── {%- endcomment -%}
+{%- if show_announce and announce_text != blank -%}
+  <div
+    class="announcement-bar"
+    role="region"
+    aria-label="Announcement"
+    id="announcement-bar"
+  >
+    <div class="announcement-bar__inner">
+      {%- if announce_url != blank -%}
+        <a href="{{ announce_url }}" class="announcement-bar__link">
+          {{- announce_text -}}
+        </a>
+      {%- else -%}
+        <p class="announcement-bar__text">{{- announce_text -}}</p>
+      {%- endif -%}
+
+      <button
+        class="announcement-bar__close"
+        aria-label="Dismiss announcement"
+        data-announce-close
+      >
+        {%- render 'icon-close' -%}
+      </button>
+    </div>
+  </div>
+{%- endif -%}
+
+{%- comment -%} ── Site Header ────────────────────────────────────────────── {%- endcomment -%}
+<header
+  class="site-header{% if sticky %} site-header--sticky{% endif %}{% if transparent %} site-header--transparent{% endif %}"
+  id="site-header"
+  role="banner"
+  data-section-id="{{ section.id }}"
+>
+  <div class="site-header__inner">
+
+    {%- comment -%} ── Logo / Brand Name ──────────────────────────────────── {%- endcomment -%}
+    <div class="site-header__logo">
+      <a href="{{ routes.root_url }}" class="site-logo" aria-label="{{ shop.name }} — home">
+        {%- if logo_image != blank -%}
+          {{
+            logo_image
+            | image_url: width: logo_width
+            | image_tag:
+              width: logo_width,
+              alt: shop.name,
+              class: 'site-logo__img',
+              loading: 'eager',
+              fetchpriority: 'high'
+          }}
+        {%- else -%}
+          <span class="site-logo__wordmark">{{ shop.name }}</span>
+        {%- endif -%}
+      </a>
+    </div>
+
+    {%- comment -%} ── Primary Navigation (desktop) ───────────────────────── {%- endcomment -%}
+    <nav class="site-nav__wrapper" aria-label="Primary navigation">
+      <ul class="site-nav" role="list">
+        {%- for link in nav_linklist.links -%}
+          {%- liquid
+            assign is_active = false
+            if link.active or link.child_active
+              assign is_active = true
+            endif
+          -%}
+          <li class="site-nav__item">
+            <a
+              href="{{ link.url }}"
+              class="site-nav__link{% if is_active %} is-active{% endif %}"
+              {% if is_active %}aria-current="page"{% endif %}
+            >
+              {%- comment -%} Stroke SVG icon — matched by nav label title {%- endcomment -%}
+              <span class="site-nav__icon" aria-hidden="true">
+                {%- case link.title -%}
+                  {%- when 'All Jewellery' -%}
+                    {%- render 'icon-all-jewellery' -%}
+                  {%- when 'Earrings' -%}
+                    {%- render 'icon-earrings' -%}
+                  {%- when 'Pendants' -%}
+                    {%- render 'icon-pendants' -%}
+                  {%- when 'Daily Wear' -%}
+                    {%- render 'icon-daily-wear' -%}
+                  {%- when 'Gifting' -%}
+                    {%- render 'icon-gifting' -%}
+                  {%- else -%}
+                    {%- render 'icon-jewellery-generic' -%}
+                {%- endcase -%}
+              </span>
+              <span class="site-nav__label">{{ link.title }}</span>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    {%- comment -%} ── Right Utility Icons ────────────────────────────────── {%- endcomment -%}
+    <div class="site-header__utils" role="group" aria-label="Site utilities">
+
+      {%- comment -%} Search toggle {%- endcomment -%}
+      <button
+        class="site-header__util-btn js-search-toggle"
+        aria-label="Open search"
+        aria-expanded="false"
+        aria-controls="site-search"
+        type="button"
+      >
+        {%- render 'icon-search' -%}
+      </button>
+
+      {%- comment -%} Wishlist — links to /pages/wishlist or a custom page {%- endcomment -%}
+      <a
+        href="/pages/wishlist"
+        class="site-header__util-btn"
+        aria-label="Wishlist"
+      >
+        {%- render 'icon-heart' -%}
+      </a>
+
+      {%- comment -%} Cart — count badge injected by header.js via Shopify fetch {%- endcomment -%}
+      <a
+        href="{{ routes.cart_url }}"
+        class="site-header__util-btn site-header__cart"
+        aria-label="Cart{% if cart.item_count > 0 %}, {{ cart.item_count }} item{% if cart.item_count != 1 %}s{% endif %}{% endif %}"
+        id="cart-icon-link"
+      >
+        {%- render 'icon-cart' -%}
+        <span
+          class="cart-badge{% if cart.item_count == 0 %} is-hidden{% endif %}"
+          id="cart-count"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {{- cart.item_count -}}
+        </span>
+      </a>
+
+      {%- comment -%} Mobile: hamburger button ──────────────────────────────── {%- endcomment -%}
+      <button
+        class="site-header__hamburger"
+        aria-label="Open navigation menu"
+        aria-expanded="false"
+        aria-controls="nav-drawer"
+        type="button"
+        id="hamburger-btn"
+      >
+        <span class="hamburger__bar" aria-hidden="true"></span>
+        <span class="hamburger__bar" aria-hidden="true"></span>
+        <span class="hamburger__bar" aria-hidden="true"></span>
+      </button>
+
+    </div><!-- /.site-header__utils -->
+
+  </div><!-- /.site-header__inner -->
+
+  {%- comment -%} ── Inline Search Bar (hidden until toggled) ─────────────── {%- endcomment -%}
+  <div
+    class="site-search"
+    id="site-search"
+    role="search"
+    aria-label="Site search"
+    aria-hidden="true"
+    hidden
+  >
+    <div class="site-search__inner">
+      <form action="{{ routes.search_url }}" method="get" class="site-search__form">
+        <input
+          type="search"
+          name="q"
+          id="search-input"
+          class="site-search__input"
+          placeholder="Search jewellery…"
+          aria-label="Search"
+          autocomplete="off"
+          data-search-input
+        >
+        <button type="submit" class="site-search__submit" aria-label="Submit search">
+          {%- render 'icon-search' -%}
+        </button>
+        <button
+          type="button"
+          class="site-search__close js-search-toggle"
+          aria-label="Close search"
+        >
+          {%- render 'icon-close' -%}
+        </button>
+      </form>
+    </div>
+  </div>
+
+</header><!-- /#site-header -->
+
+{%- comment -%} ── Mobile Nav Drawer ──────────────────────────────────────── {%- endcomment -%}
+<div
+  class="nav-drawer"
+  id="nav-drawer"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Navigation menu"
+  aria-hidden="true"
+  tabindex="-1"
+>
+  <div class="nav-drawer__header">
+    <span class="nav-drawer__brand">{{ shop.name }}</span>
+    <button
+      class="nav-drawer__close"
+      aria-label="Close navigation menu"
+      type="button"
+      id="drawer-close-btn"
+    >
+      {%- render 'icon-close' -%}
+    </button>
+  </div>
+
+  <nav class="nav-drawer__nav" aria-label="Mobile navigation">
+    <ul class="nav-drawer__list" role="list">
+      {%- for link in nav_linklist.links -%}
+        {%- liquid
+          assign is_active = false
+          if link.active or link.child_active
+            assign is_active = true
+          endif
+        -%}
+        <li class="nav-drawer__item">
+          <a
+            href="{{ link.url }}"
+            class="nav-drawer__link{% if is_active %} is-active{% endif %}"
+            {% if is_active %}aria-current="page"{% endif %}
+          >
+            <span class="nav-drawer__icon" aria-hidden="true">
+              {%- case link.title -%}
+                {%- when 'All Jewellery' -%}
+                  {%- render 'icon-all-jewellery' -%}
+                {%- when 'Earrings' -%}
+                  {%- render 'icon-earrings' -%}
+                {%- when 'Pendants' -%}
+                  {%- render 'icon-pendants' -%}
+                {%- when 'Daily Wear' -%}
+                  {%- render 'icon-daily-wear' -%}
+                {%- when 'Gifting' -%}
+                  {%- render 'icon-gifting' -%}
+                {%- else -%}
+                  {%- render 'icon-jewellery-generic' -%}
+              {%- endcase -%}
+            </span>
+            <span class="nav-drawer__label">{{ link.title }}</span>
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </nav>
+
+  {%- comment -%} Drawer footer — utility links {%- endcomment -%}
+  <div class="nav-drawer__footer">
+    <a href="{{ routes.search_url }}" class="nav-drawer__util">
+      {%- render 'icon-search' -%}
+      <span>Search</span>
+    </a>
+    <a href="/pages/wishlist" class="nav-drawer__util">
+      {%- render 'icon-heart' -%}
+      <span>Wishlist</span>
+    </a>
+    <a href="{{ routes.cart_url }}" class="nav-drawer__util">
+      {%- render 'icon-cart' -%}
+      <span>Cart</span>
+    </a>
+  </div>
+</div><!-- /#nav-drawer -->
+
+{%- comment -%} ── Backdrop overlay for mobile drawer ─────────────────────── {%- endcomment -%}
+<div
+  class="nav-drawer__overlay"
+  id="nav-overlay"
+  aria-hidden="true"
+  tabindex="-1"
+></div>
+
+{%- comment -%} ── CSS & JS assets ────────────────────────────────────────── {%- endcomment -%}
+{{ 'header.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'header.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Header",
+  "tag": "div",
+  "class": "section-header-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_image",
+      "label": "Logo image",
+      "info": "Leave blank to display the shop name as text."
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Logo image width",
+      "min": 60,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 120
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "main_menu",
+      "label": "Main menu",
+      "default": "main-menu",
+      "info": "Each link title must match exactly: All Jewellery, Earrings, Pendants, Daily Wear, Gifting — for icons to render correctly."
+    },
+    {
+      "type": "header",
+      "content": "Behaviour"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Sticky header",
+      "default": true,
+      "info": "Header stays fixed at the top while scrolling."
+    },
+    {
+      "type": "checkbox",
+      "id": "transparent_on_hero",
+      "label": "Transparent over hero",
+      "default": false,
+      "info": "Make header background transparent when positioned over a hero section. Requires hero section to add the 'has-hero' class to <body>."
+    },
+    {
+      "type": "header",
+      "content": "Announcement Bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_announcement",
+      "label": "Show announcement bar",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "announcement_text",
+      "label": "Announcement text",
+      "default": "Free shipping on orders above ₹2,999"
+    },
+    {
+      "type": "url",
+      "id": "announcement_url",
+      "label": "Announcement link",
+      "info": "Optional — wraps the announcement text in a link."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Header"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,300 @@
+{%- comment -%}
+  Section: shop-by-category.liquid
+  Brand: Saanjh Fine Jewellery
+  Purpose: Horizontal category grid with SVG icons matching the navbar icon
+           language. 5 cards, responsive row → scroll on mobile.
+{%- endcomment -%}
+
+{%- comment -%}
+  Map each category preset label to the correct icon snippet name.
+  Icon snippets are expected at snippets/icon-*.liquid.
+  Each snippet accepts `size` (px number) and `class` parameters.
+{%- endcomment -%}
+{%- liquid
+  assign icon_map = 'All Jewellery:icon-all-jewellery,Earrings:icon-earrings,Pendants:icon-pendants,Daily Wear:icon-daily-wear,Gifting:icon-gifting' | split: ','
+-%}
+
+<section
+  class="shop-by-category"
+  id="shop-by-category-{{ section.id }}"
+  aria-labelledby="sbc-heading-{{ section.id }}"
+>
+  <div class="page-width">
+
+    {%- if section.settings.section_title != blank -%}
+      <h2
+        class="shop-by-category__heading"
+        id="sbc-heading-{{ section.id }}"
+      >
+        {{ section.settings.section_title | escape }}
+      </h2>
+    {%- endif -%}
+
+    <div class="shop-by-category__track" role="list">
+
+      {%- for block in section.blocks -%}
+        {%- comment -%}
+          Determine which icon to render.
+          If the merchant set an override_icon_label in the block settings
+          we use that; otherwise we derive from the block title.
+        {%- endcomment -%}
+        {%- liquid
+          assign raw_label = block.settings.override_icon_label | default: block.settings.title
+          assign icon_name = ''
+          for pair in icon_map
+            assign parts = pair | split: ':'
+            if parts[0] == raw_label
+              assign icon_name = parts[1]
+            endif
+          endfor
+          if icon_name == ''
+            assign icon_name = raw_label | downcase | replace: ' ', '-' | prepend: 'icon-'
+          endif
+        -%}
+
+        <div
+          class="category-card"
+          role="listitem"
+          {{ block.shopify_attributes }}
+        >
+          <a
+            href="{{ block.settings.url | default: '#' }}"
+            class="category-card__link"
+            aria-label="{{ block.settings.title | escape }}"
+          >
+            <span class="category-card__icon-wrap" aria-hidden="true">
+              {%- render icon_name, size: 40, class: 'category-card__icon' -%}
+            </span>
+            <span class="category-card__label">
+              {{ block.settings.title | escape }}
+            </span>
+          </a>
+        </div>
+
+      {%- else -%}
+        {%- comment -%} Fallback default cards when no blocks are added {%- endcomment -%}
+        {%- assign default_categories = 'All Jewellery,Earrings,Pendants,Daily Wear,Gifting' | split: ',' -%}
+        {%- for cat in default_categories -%}
+          {%- assign def_icon = cat | downcase | replace: ' ', '-' | prepend: 'icon-' -%}
+          <div class="category-card" role="listitem">
+            <a href="#" class="category-card__link" aria-label="{{ cat | escape }}">
+              <span class="category-card__icon-wrap" aria-hidden="true">
+                {%- render def_icon, size: 40, class: 'category-card__icon' -%}
+              </span>
+              <span class="category-card__label">{{ cat }}</span>
+            </a>
+          </div>
+        {%- endfor -%}
+      {%- endfor -%}
+
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ─── Shop by Category ───────────────────────────────────── */
+
+  .shop-by-category {
+    padding: var(--section-padding-y, 5rem) 0;
+    background-color: var(--color-bg, #F7F4EF);
+  }
+
+  /* ─── Section Heading ────────────────────────────────────── */
+
+  .shop-by-category__heading {
+    font-family: var(--font-display, 'Cormorant Garamond', Georgia, serif);
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--color-ink, #1C1B1A);
+    text-align: center;
+    margin: 0 0 3rem;
+  }
+
+  /* ─── Card Track ─────────────────────────────────────────── */
+
+  .shop-by-category__track {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    /* Horizontal scroll on small screens */
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    /* Hide scrollbar visually */
+    scrollbar-width: none;
+    padding-bottom: 0.5rem;       /* room for focus rings */
+  }
+
+  .shop-by-category__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ─── Category Card ──────────────────────────────────────── */
+
+  .category-card {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    /* Responsive sizing */
+    width: clamp(120px, 17vw, 180px);
+  }
+
+  .category-card__link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.875rem;
+    padding: 1.75rem 1rem;
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: var(--color-ink, #1C1B1A);
+    transition:
+      color 0.3s ease,
+      border-color 0.3s ease,
+      transform 0.3s ease,
+      background-color 0.3s ease;
+  }
+
+  /* Hover / focus state */
+  .category-card__link:hover,
+  .category-card__link:focus-visible {
+    color: var(--color-accent, #B08A5A);
+    border-color: var(--color-surface, #EFEBE3);
+    background-color: var(--color-surface, #EFEBE3);
+    transform: translateY(-4px);
+    outline: none;
+  }
+
+  /* ─── Icon ───────────────────────────────────────────────── */
+
+  .category-card__icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+  }
+
+  /*
+    The rendered SVG icon snippet should emit an <svg> with class="category-card__icon".
+    We enforce stroke color inheritance so the hover accent propagates.
+  */
+  .category-card__icon,
+  .category-card__icon-wrap svg {
+    width: 40px;
+    height: 40px;
+    stroke: currentColor;
+    fill: none;
+    transition: stroke 0.3s ease;
+  }
+
+  /* ─── Label ──────────────────────────────────────────────── */
+
+  .category-card__label {
+    font-family: var(--font-body, 'Poppins', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.4;
+    color: inherit;
+    transition: color 0.3s ease;
+  }
+
+  /* ─── Responsive ─────────────────────────────────────────── */
+
+  /* Tablet: show 3 fully, hint at 4th */
+  @media (max-width: 900px) {
+    .shop-by-category__track {
+      justify-content: flex-start;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+
+    .category-card {
+      width: clamp(110px, 28vw, 160px);
+    }
+  }
+
+  /* Mobile: show ~2 fully, hint at 3rd */
+  @media (max-width: 600px) {
+    .shop-by-category {
+      padding: 3.5rem 0;
+    }
+
+    .shop-by-category__heading {
+      margin-bottom: 2rem;
+    }
+
+    .category-card {
+      width: clamp(130px, 40vw, 160px);
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Shop by Category",
+  "tag": "section",
+  "class": "section-shop-by-category",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section title",
+      "default": "Shop by Category"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "select",
+          "id": "title",
+          "label": "Category name",
+          "options": [
+            { "value": "All Jewellery", "label": "All Jewellery" },
+            { "value": "Earrings",      "label": "Earrings" },
+            { "value": "Pendants",      "label": "Pendants" },
+            { "value": "Daily Wear",    "label": "Daily Wear" },
+            { "value": "Gifting",       "label": "Gifting" }
+          ],
+          "default": "Earrings"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link URL"
+        },
+        {
+          "type": "text",
+          "id": "override_icon_label",
+          "label": "Icon override label",
+          "info": "Leave blank to auto-match icon from the category name above."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop by Category",
+      "settings": {
+        "section_title": "Shop by Category"
+      },
+      "blocks": [
+        { "type": "category", "settings": { "title": "All Jewellery" } },
+        { "type": "category", "settings": { "title": "Earrings" } },
+        { "type": "category", "settings": { "title": "Pendants" } },
+        { "type": "category", "settings": { "title": "Daily Wear" } },
+        { "type": "category", "settings": { "title": "Gifting" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

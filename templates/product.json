@@ -1,0 +1,23 @@
+{
+  "sections": {
+    "product-media": {
+      "type": "product-media",
+      "settings": {
+        "enable_zoom": true,
+        "enable_360": false,
+        "thumbnail_position": "below"
+      }
+    },
+    "product-info": {
+      "type": "product-info",
+      "settings": {
+        "show_trust_signals": true,
+        "trust_signal_1": "BIS Hallmark Certified",
+        "trust_signal_2": "Free Shipping on orders ₹5,000+",
+        "trust_signal_3": "Easy 15-Day Returns",
+        "show_styling_notes": true
+      }
+    }
+  },
+  "order": ["product-media", "product-info"]
+}

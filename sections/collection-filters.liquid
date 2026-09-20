@@ -1,0 +1,302 @@
+{% comment %}
+  Section: collection-filters.liquid
+  Purpose: Sidebar filter panel — accordion groups, active filter pills,
+           mobile bottom sheet, Shopify native URL-param filters.
+  Brand: Saanjh — composed, editorial, no clutter.
+{% endcomment %}
+
+<link rel="stylesheet" href="{{ 'collection.css' | asset_url }}" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="{{ 'collection.css' | asset_url }}"></noscript>
+
+{%- comment -%} Mobile: trigger button rendered outside the panel {%- endcomment -%}
+<button
+  class="filter-mobile-trigger"
+  aria-controls="FilterPanel"
+  aria-expanded="false"
+  data-filter-mobile-trigger
+  type="button"
+>
+  {% render 'icon-filter' %}
+  <span>Filter</span>
+</button>
+
+{%- comment -%}
+  Overlay backdrop for mobile bottom sheet
+{%- endcomment -%}
+<div
+  class="filter-overlay"
+  data-filter-overlay
+  aria-hidden="true"
+  tabindex="-1"
+></div>
+
+{%- comment -%} ── Filter Panel ── {%- endcomment -%}
+<aside
+  id="FilterPanel"
+  class="filter-panel"
+  aria-label="Product filters"
+  data-filter-panel
+>
+
+  {%- comment -%} Panel header — shown on mobile only {%- endcomment -%}
+  <div class="filter-panel__header">
+    <h2 class="filter-panel__heading">I know what I want</h2>
+    <button
+      class="filter-panel__close"
+      aria-label="Close filters"
+      data-filter-close
+      type="button"
+    >
+      {% render 'icon-x' %}
+    </button>
+  </div>
+
+  {%- comment -%} ── Active Filter Pills ── {%- endcomment -%}
+  {%- assign active_filters = collection.filters | where: 'active_values' -%}
+  {%- assign active_count = 0 -%}
+  {%- for filter in collection.filters -%}
+    {%- assign active_count = active_count | plus: filter.active_values.size -%}
+    {%- if filter.type == 'price_range' -%}
+      {%- if filter.min_value.value or filter.max_value.value -%}
+        {%- assign active_count = active_count | plus: 1 -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {% if active_count > 0 %}
+    <div class="filter-active" aria-label="Active filters">
+      <p class="filter-active__label">Active filters:</p>
+      <ul class="filter-active__pills" role="list">
+
+        {% for filter in collection.filters %}
+          {% if filter.type == 'price_range' %}
+            {% if filter.min_value.value or filter.max_value.value %}
+              <li class="filter-active__pill-item">
+                <a
+                  href="{{ filter.url_to_remove }}"
+                  class="filter-pill filter-pill--remove"
+                  aria-label="Remove price filter"
+                >
+                  ₹{{ filter.min_value.value | default: 0 | money_without_currency }}
+                  –
+                  ₹{{ filter.max_value.value | default: filter.range_max | money_without_currency }}
+                  <span class="filter-pill__remove" aria-hidden="true">{% render 'icon-x-small' %}</span>
+                </a>
+              </li>
+            {% endif %}
+          {% else %}
+            {% for value in filter.active_values %}
+              <li class="filter-active__pill-item">
+                <a
+                  href="{{ value.url_to_remove }}"
+                  class="filter-pill filter-pill--remove"
+                  aria-label="Remove filter: {{ value.label | escape }}"
+                >
+                  {{ value.label }}
+                  <span class="filter-pill__remove" aria-hidden="true">{% render 'icon-x-small' %}</span>
+                </a>
+              </li>
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+
+        {%- comment -%} Clear all link {%- endcomment -%}
+        <li class="filter-active__pill-item">
+          <a href="{{ collection.url }}" class="filter-pill filter-pill--clear">
+            Clear all
+          </a>
+        </li>
+
+      </ul>
+    </div>
+  {% endif %}
+
+  {%- comment -%} ── Filter Groups Form ── {%- endcomment -%}
+  <form
+    id="FilterForm"
+    class="filter-form"
+    method="get"
+    action="{{ collection.url }}"
+    data-filter-form
+  >
+
+    {%- comment -%} Preserve existing sort_by param {%- endcomment -%}
+    <input
+      type="hidden"
+      name="sort_by"
+      value="{{ collection.sort_by | default: collection.default_sort_by }}"
+    >
+
+    {% for filter in collection.filters %}
+      <details
+        class="filter-group"
+        data-filter-group
+        {% if filter.active_values.size > 0 %}open{% endif %}
+        {% if filter.type == 'price_range' and filter.min_value.value or filter.max_value.value %}open{% endif %}
+      >
+        <summary class="filter-group__summary" aria-expanded="false">
+          <span class="filter-group__label">
+            {%- case filter.label -%}
+              {%- when 'Product type' -%}Type
+              {%- when 'Price' -%}Price
+              {%- else -%}{{ filter.label }}
+            {%- endcase -%}
+            {% if filter.active_values.size > 0 %}
+              <span class="filter-group__badge" aria-label="{{ filter.active_values.size }} active">
+                {{ filter.active_values.size }}
+              </span>
+            {% endif %}
+          </span>
+          <span class="filter-group__chevron" aria-hidden="true">
+            {% render 'icon-chevron-down' %}
+          </span>
+        </summary>
+
+        <div class="filter-group__body">
+
+          {%- if filter.type == 'price_range' -%}
+            {%- comment -%} Price range inputs {%- endcomment -%}
+            <div class="filter-price">
+              <div class="filter-price__field">
+                <label class="filter-price__label" for="Filter-{{ filter.param_name }}-min">
+                  Min (₹)
+                </label>
+                <input
+                  id="Filter-{{ filter.param_name }}-min"
+                  class="filter-price__input"
+                  type="number"
+                  name="{{ filter.min_value.param_name }}"
+                  value="{{ filter.min_value.value | divided_by: 100 | ceil }}"
+                  min="0"
+                  max="{{ filter.range_max | divided_by: 100 | ceil }}"
+                  placeholder="0"
+                  data-filter-price-min
+                >
+              </div>
+              <span class="filter-price__separator" aria-hidden="true">–</span>
+              <div class="filter-price__field">
+                <label class="filter-price__label" for="Filter-{{ filter.param_name }}-max">
+                  Max (₹)
+                </label>
+                <input
+                  id="Filter-{{ filter.param_name }}-max"
+                  class="filter-price__input"
+                  type="number"
+                  name="{{ filter.max_value.param_name }}"
+                  value="{{ filter.max_value.value | divided_by: 100 | ceil }}"
+                  min="0"
+                  max="{{ filter.range_max | divided_by: 100 | ceil }}"
+                  placeholder="{{ filter.range_max | divided_by: 100 | ceil }}"
+                  data-filter-price-max
+                >
+              </div>
+            </div>
+            <button type="submit" class="filter-price__apply btn-ghost">Apply</button>
+
+          {%- elsif filter.type == 'boolean' or filter.type == 'list' -%}
+            {%- comment -%} Checkbox list {%- endcomment -%}
+            <ul class="filter-list" role="list">
+              {% for value in filter.values %}
+                <li class="filter-list__item">
+                  <label class="filter-list__label {% if value.count == 0 and value.active == false %}filter-list__label--disabled{% endif %}">
+                    <input
+                      class="filter-list__checkbox"
+                      type="checkbox"
+                      name="{{ value.param_name }}"
+                      value="{{ value.value }}"
+                      {% if value.active %}checked{% endif %}
+                      {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                      data-filter-checkbox
+                    >
+                    <span class="filter-list__swatch-wrapper">
+                      {%- comment -%}
+                        Colour swatches for Metal / Stone filters.
+                        Match by lowercase label — expand as needed.
+                      {%- endcomment -%}
+                      {%- assign label_lower = value.label | downcase -%}
+                      {%- if label_lower == 'rose gold' -%}
+                        <span class="filter-swatch" style="background: linear-gradient(135deg,#E8B4A0,#C97B5B)" aria-hidden="true"></span>
+                      {%- elsif label_lower == 'yellow gold' -%}
+                        <span class="filter-swatch" style="background: linear-gradient(135deg,#F5D68B,#C8A84B)" aria-hidden="true"></span>
+                      {%- elsif label_lower == 'white gold' -%}
+                        <span class="filter-swatch" style="background: linear-gradient(135deg,#F0F0F0,#C8C8C8)" aria-hidden="true"></span>
+                      {%- elsif label_lower == 'silver' -%}
+                        <span class="filter-swatch" style="background: linear-gradient(135deg,#E8E8E8,#A8A8A8)" aria-hidden="true"></span>
+                      {%- elsif label_lower == 'diamond' -%}
+                        <span class="filter-swatch filter-swatch--diamond" aria-hidden="true">◇</span>
+                      {%- elsif label_lower == 'ruby' -%}
+                        <span class="filter-swatch" style="background:#9B2335" aria-hidden="true"></span>
+                      {%- elsif label_lower == 'emerald' -%}
+                        <span class="filter-swatch" style="background:#2E7D5E" aria-hidden="true"></span>
+                      {%- elsif label_lower == 'sapphire' -%}
+                        <span class="filter-swatch" style="background:#1B3A6B" aria-hidden="true"></span>
+                      {%- endif -%}
+                    </span>
+                    <span class="filter-list__text">{{ value.label }}</span>
+                    <span class="filter-list__count" aria-label="{{ value.count }} products">
+                      ({{ value.count }})
+                    </span>
+                  </label>
+                </li>
+              {% endfor %}
+            </ul>
+
+          {%- endif -%}
+
+        </div>
+      </details>
+    {% endfor %}
+
+    {%- comment -%} Hidden submit — form submits via JS on checkbox change {%- endcomment -%}
+    <button type="submit" class="visually-hidden" aria-label="Apply filters">Apply</button>
+
+  </form>
+
+  {%- comment -%} Mobile: Apply / Reset footer buttons {%- endcomment -%}
+  <div class="filter-panel__footer">
+    <a href="{{ collection.url }}" class="filter-panel__reset btn-ghost">Reset</a>
+    <button
+      class="filter-panel__apply btn-primary"
+      data-filter-apply
+      type="button"
+    >
+      View pieces
+    </button>
+  </div>
+
+</aside>
+
+<script src="{{ 'collection.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Collection Filters",
+  "tag": "section",
+  "class": "section-collection-filters",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_filter_panel",
+      "label": "Show filter sidebar",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_active_filters",
+      "label": "Show active filter pills",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "filters_open_by_default",
+      "label": "Expand all filter groups by default",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Filters"
+    }
+  ]
+}
+{% endschema %}

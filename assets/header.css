@@ -1,0 +1,785 @@
+/*
+ * assets/header.css
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Saanjh — Site Header Styles
+ *
+ * Design tokens expected from theme root (layout/theme.liquid or base.css):
+ *   --color-bg       : #F7F4EF
+ *   --color-ink      : #1C1B1A
+ *   --color-accent   : #B08A5A
+ *   --color-surface  : #EFEBE3
+ *   --color-muted    : #8A8680
+ *   --color-cta      : #8B2635
+ *   --font-display   : 'Cormorant Garamond', serif
+ *   --font-body      : 'Poppins', sans-serif
+ *   --transition-base: 300ms ease
+ *   --z-header       : 100
+ *   --grid-gutter    : clamp(1.25rem, 4vw, 3rem)
+ *
+ * Table of contents:
+ *   1. Announcement Bar
+ *   2. Site Header Shell
+ *   3. Logo / Wordmark
+ *   4. Primary Navigation (desktop)
+ *   5. Utility Icons
+ *   6. Cart Badge
+ *   7. Hamburger Button
+ *   8. Mobile Off-Canvas Drawer
+ *   9. Overlay Backdrop
+ *  10. Inline Search Bar
+ *  11. Scroll Shadow State
+ *  12. Transparent-on-Hero Variant
+ *  13. Responsive Overrides
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   1. Announcement Bar
+   ───────────────────────────────────────────────────────────────────────────── */
+.announcement-bar {
+  background-color: var(--color-ink);
+  color: var(--color-bg);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-align: center;
+  position: relative;
+  z-index: calc(var(--z-header) + 1);
+}
+
+.announcement-bar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.5rem var(--grid-gutter);
+}
+
+.announcement-bar__link {
+  color: inherit;
+  text-decoration: none;
+  transition: opacity var(--transition-base);
+}
+
+.announcement-bar__link:hover {
+  opacity: 0.75;
+}
+
+.announcement-bar__text {
+  margin: 0;
+}
+
+.announcement-bar__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: var(--grid-gutter);
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-bg);
+  padding: 0.25rem;
+  opacity: 0.65;
+  transition: opacity var(--transition-base);
+}
+
+.announcement-bar__close:hover {
+  opacity: 1;
+}
+
+.announcement-bar__close svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   2. Site Header Shell
+   ───────────────────────────────────────────────────────────────────────────── */
+.site-header {
+  background-color: var(--color-bg);
+  border-bottom: 1px solid rgba(28, 27, 26, 0.08);
+  padding: 0 var(--grid-gutter);
+  /* Sticky is applied via class .site-header--sticky */
+  transition:
+    box-shadow var(--transition-base),
+    background-color var(--transition-base);
+}
+
+/* Sticky positioning added conditionally via schema toggle */
+.site-header--sticky {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+}
+
+/* Fallback for non-sticky: still in normal flow */
+.site-header:not(.site-header--sticky) {
+  position: relative;
+  z-index: var(--z-header);
+}
+
+/* Inner flex row */
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+  gap: 1.5rem;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   3. Logo / Wordmark
+   ───────────────────────────────────────────────────────────────────────────── */
+.site-header__logo {
+  flex-shrink: 0;
+}
+
+.site-logo {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--color-ink);
+  transition: opacity var(--transition-base);
+}
+
+.site-logo:hover {
+  opacity: 0.8;
+}
+
+/* Text wordmark (displayed when no logo image is set) */
+.site-logo__wordmark {
+  font-family: var(--font-display);
+  font-size: 1.625rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1;
+  /* Fine optical kerning for display typeface */
+  font-feature-settings: 'kern' 1, 'liga' 1;
+}
+
+/* Image logo */
+.site-logo__img {
+  display: block;
+  height: auto;
+  width: var(--logo-width, 120px);
+  max-height: 48px;
+  object-fit: contain;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   4. Primary Navigation (desktop)
+   ───────────────────────────────────────────────────────────────────────────── */
+.site-nav__wrapper {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 40px;
+}
+
+.site-nav__item {
+  display: flex;
+  align-items: center;
+}
+
+/* Each nav link: flex row with icon + label */
+.site-nav__link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  position: relative;
+  text-decoration: none;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;        /* 13px — refined Poppins size */
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  /* Smooth colour transition */
+  transition: color var(--transition-base);
+  /* GPU hint for underline animation */
+  will-change: color;
+}
+
+/* ── Stroke icon container ── */
+.site-nav__icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  /* Inherits currentColor so the SVG stroke follows link colour */
+  color: inherit;
+}
+
+.site-nav__icon svg {
+  width: 100%;
+  height: 100%;
+  /* Stroke-based SVGs must use stroke="currentColor" in the snippet */
+  display: block;
+}
+
+/* ── Animated underline via ::after ── */
+.site-nav__link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--transition-base);
+}
+
+/* ── Hover state ── */
+.site-nav__link:hover {
+  color: var(--color-accent);
+}
+
+.site-nav__link:hover::after {
+  transform: scaleX(1);
+}
+
+/* ── Active / current-page state ── */
+.site-nav__link.is-active {
+  color: var(--color-accent);
+}
+
+.site-nav__link.is-active::after {
+  transform: scaleX(1);
+  /* Deeper burgundy underline for active page — reference image spec */
+  background: var(--color-cta);
+}
+
+/* Focus-visible ring for keyboard navigation */
+.site-nav__link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   5. Utility Icons
+   ───────────────────────────────────────────────────────────────────────────── */
+.site-header__utils {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+/* Shared button / link reset for utility icons */
+.site-header__util-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--color-ink);
+  text-decoration: none;
+  transition: color var(--transition-base);
+  border-radius: 4px;
+}
+
+.site-header__util-btn:hover {
+  color: var(--color-accent);
+}
+
+.site-header__util-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.site-header__util-btn svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   6. Cart Badge
+   ───────────────────────────────────────────────────────────────────────────── */
+.site-header__cart {
+  /* Relative positioning already on .site-header__util-btn */
+}
+
+.cart-badge {
+  position: absolute;
+  top: -3px;
+  right: -5px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-cta);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.625rem;  /* 10px */
+  font-weight: 600;
+  letter-spacing: 0;
+  border-radius: 100px;
+  line-height: 1;
+  pointer-events: none;
+  /* Smooth appear / count change */
+  transition: transform var(--transition-base), opacity var(--transition-base);
+}
+
+.cart-badge.is-hidden {
+  transform: scale(0);
+  opacity: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   7. Hamburger Button  (visible only on mobile — hidden by default)
+   ───────────────────────────────────────────────────────────────────────────── */
+.site-header__hamburger {
+  display: none;   /* shown via media query below */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  padding: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-ink);
+  border-radius: 4px;
+  transition: color var(--transition-base);
+}
+
+.site-header__hamburger:hover {
+  color: var(--color-accent);
+}
+
+.site-header__hamburger:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.hamburger__bar {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 2px;
+  /* Morph animation from ≡ to ✕ */
+  transition:
+    transform var(--transition-base),
+    opacity var(--transition-base),
+    width var(--transition-base);
+  transform-origin: center center;
+}
+
+/* Open state — bars animate to X */
+.site-header__hamburger[aria-expanded='true'] .hamburger__bar:nth-child(1) {
+  transform: translateY(6.5px) rotate(45deg);
+}
+
+.site-header__hamburger[aria-expanded='true'] .hamburger__bar:nth-child(2) {
+  opacity: 0;
+  width: 0;
+}
+
+.site-header__hamburger[aria-expanded='true'] .hamburger__bar:nth-child(3) {
+  transform: translateY(-6.5px) rotate(-45deg);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   8. Mobile Off-Canvas Drawer
+   ───────────────────────────────────────────────────────────────────────────── */
+.nav-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 280px;
+  max-width: 85vw;
+  background-color: var(--color-bg);
+  z-index: calc(var(--z-header) + 10);
+  display: flex;
+  flex-direction: column;
+  /* Hidden off-screen by default */
+  transform: translateX(-100%);
+  transition: transform 300ms ease;
+  /* Hardware-accelerate the slide */
+  will-change: transform;
+  /* Prevent content overflow */
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Subtle right border */
+  border-right: 1px solid rgba(28, 27, 26, 0.08);
+  /* Smooth shadow when open */
+  box-shadow: 4px 0 24px rgba(28, 27, 26, 0);
+  transition:
+    transform 300ms ease,
+    box-shadow 300ms ease;
+}
+
+/* Open state (class toggled by header.js) */
+.nav-drawer.is-open {
+  transform: translateX(0);
+  box-shadow: 4px 0 24px rgba(28, 27, 26, 0.12);
+}
+
+/* Drawer header row */
+.nav-drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(28, 27, 26, 0.08);
+  flex-shrink: 0;
+}
+
+.nav-drawer__brand {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
+.nav-drawer__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-ink);
+  padding: 4px;
+  border-radius: 4px;
+  transition: color var(--transition-base);
+}
+
+.nav-drawer__close:hover {
+  color: var(--color-accent);
+}
+
+.nav-drawer__close:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.nav-drawer__close svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Drawer nav list */
+.nav-drawer__nav {
+  flex: 1 1 auto;
+  padding: 1rem 0;
+  overflow-y: auto;
+}
+
+.nav-drawer__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-drawer__item {
+  border-bottom: 1px solid rgba(28, 27, 26, 0.05);
+}
+
+.nav-drawer__link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem 1.5rem;
+  text-decoration: none;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  transition: color var(--transition-base), background-color var(--transition-base);
+  /* Subtle arrow nudge on hover */
+  position: relative;
+}
+
+.nav-drawer__link:hover {
+  color: var(--color-accent);
+  background-color: var(--color-surface);
+}
+
+.nav-drawer__link.is-active {
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+.nav-drawer__link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+.nav-drawer__icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.nav-drawer__icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.nav-drawer__label {
+  flex: 1 1 auto;
+}
+
+/* Drawer footer — utility shortcuts */
+.nav-drawer__footer {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border-top: 1px solid rgba(28, 27, 26, 0.08);
+  padding: 1rem 1.5rem;
+  flex-shrink: 0;
+}
+
+.nav-drawer__util {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  flex-direction: column;
+  text-decoration: none;
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: color var(--transition-base);
+  text-align: center;
+}
+
+.nav-drawer__util:hover {
+  color: var(--color-accent);
+}
+
+.nav-drawer__util svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   9. Overlay Backdrop
+   ───────────────────────────────────────────────────────────────────────────── */
+.nav-drawer__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 27, 26, 0);
+  z-index: calc(var(--z-header) + 9);
+  pointer-events: none;
+  transition: background-color 300ms ease;
+}
+
+/* Active overlay when drawer is open */
+.nav-drawer__overlay.is-visible {
+  background: rgba(28, 27, 26, 0.45);
+  pointer-events: auto;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   10. Inline Search Bar
+   ───────────────────────────────────────────────────────────────────────────── */
+.site-search {
+  overflow: hidden;
+  /* Collapse height animation */
+  max-height: 0;
+  opacity: 0;
+  transition:
+    max-height 300ms ease,
+    opacity 300ms ease;
+  border-top: 1px solid transparent;
+}
+
+/* hidden attribute is removed by JS; max-height animates open */
+.site-search:not([hidden]) {
+  max-height: 80px;
+  opacity: 1;
+  border-top-color: rgba(28, 27, 26, 0.08);
+}
+
+.site-search__inner {
+  padding: 0.75rem var(--grid-gutter);
+}
+
+.site-search__form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: var(--color-surface);
+  border-radius: 4px;
+  padding: 0 0.75rem;
+}
+
+.site-search__input {
+  flex: 1 1 auto;
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--color-ink);
+  padding: 0.625rem 0;
+  outline: none;
+  letter-spacing: 0.02em;
+}
+
+.site-search__input::placeholder {
+  color: var(--color-muted);
+}
+
+.site-search__submit,
+.site-search__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-muted);
+  padding: 4px;
+  border-radius: 2px;
+  transition: color var(--transition-base);
+  flex-shrink: 0;
+}
+
+.site-search__submit:hover,
+.site-search__close:hover {
+  color: var(--color-accent);
+}
+
+.site-search__submit svg,
+.site-search__close svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   11. Scroll Shadow State (class toggled by header.js on scroll)
+   ───────────────────────────────────────────────────────────────────────────── */
+.site-header.has-shadow {
+  box-shadow: 0 2px 16px rgba(28, 27, 26, 0.08);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   12. Transparent-on-Hero Variant
+       Applied when body has .has-hero AND schema toggle is on.
+   ───────────────────────────────────────────────────────────────────────────── */
+.has-hero .site-header--transparent {
+  background-color: transparent;
+  border-bottom-color: transparent;
+}
+
+/* Revert to solid background once user scrolls */
+.has-hero .site-header--transparent.has-shadow {
+  background-color: var(--color-bg);
+  border-bottom-color: rgba(28, 27, 26, 0.08);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   13. Responsive Overrides
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── Tablet: compress nav gap ── */
+@media (max-width: 1024px) {
+  .site-nav {
+    gap: 24px;
+  }
+
+  .site-nav__link {
+    font-size: 0.75rem;
+  }
+}
+
+/* ── Mobile: hide desktop nav, show hamburger ── */
+@media (max-width: 768px) {
+  /* Hide primary nav on mobile */
+  .site-nav__wrapper {
+    display: none;
+  }
+
+  /* Show hamburger */
+  .site-header__hamburger {
+    display: flex;
+  }
+
+  /* Reduce header height slightly on small screens */
+  .site-header__inner {
+    height: 60px;
+  }
+
+  /* Logo slightly smaller */
+  .site-logo__wordmark {
+    font-size: 1.375rem;
+  }
+
+  /* Tighten utility gap */
+  .site-header__utils {
+    gap: 14px;
+  }
+}
+
+/* ── Very small screens ── */
+@media (max-width: 380px) {
+  .site-header {
+    padding: 0 1rem;
+  }
+
+  .nav-drawer {
+    width: 85vw;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Reduced-motion: respect user preference, remove transitions
+   ───────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .site-nav__link,
+  .site-nav__link::after,
+  .site-header,
+  .nav-drawer,
+  .nav-drawer__overlay,
+  .cart-badge,
+  .hamburger__bar,
+  .site-search {
+    transition: none !important;
+  }
+}

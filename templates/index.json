@@ -1,0 +1,45 @@
+{
+  "sections": {
+    "announcement": {
+      "type": "announcement-bar",
+      "settings": {
+        "message": "Free shipping on orders above ₹5,000 · Certified Hallmark Jewelry",
+        "background_style": "ink",
+        "show_close_button": true
+      }
+    },
+    "hero": {
+      "type": "hero-editorial",
+      "settings": {
+        "heading_text": "Saanjh",
+        "tagline_text": "Fine Jewelry for Every Ritual",
+        "cta_label": "Explore Collection",
+        "cta_url": "/collections/all",
+        "overlay_opacity": 35,
+        "text_color": "light",
+        "height": "full"
+      }
+    },
+    "shop-by-category": {
+      "type": "shop-by-category",
+      "settings": {
+        "section_title": "Shop by Category"
+      }
+    },
+    "editors-picks": {
+      "type": "editors-picks",
+      "settings": {
+        "section_label": "Editor's Picks",
+        "section_heading": "Pieces We Love Right Now",
+        "cta_label": "View All",
+        "cta_url": "/collections/all"
+      }
+    }
+  },
+  "order": [
+    "announcement",
+    "hero",
+    "shop-by-category",
+    "editors-picks"
+  ]
+}
