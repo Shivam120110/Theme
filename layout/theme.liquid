@@ -18,11 +18,7 @@
 
   <!-- Canonical & hreflang -->
   <link rel="canonical" href="{{ canonical_url }}">
-  {% if settings.enable_open_graph %}
-    {{ content_for_header }}
-  {% else %}
-    {{ content_for_header }}
-  {% endif %}
+  {{ content_for_header }}
 
   <!-- Favicon -->
   {% if settings.favicon != blank %}
