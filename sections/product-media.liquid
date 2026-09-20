@@ -10,7 +10,10 @@
 
 {%- assign first_media = product.media | first -%}
 {%- assign spin_url    = product.metafields.custom.spin_embed_url.value -%}
-{%- assign has_360     = section.settings.enable_360 | and: spin_url -%}
+{%- assign has_360     = false -%}
+{%- if section.settings.enable_360 and spin_url != blank -%}
+  {%- assign has_360   = true -%}
+{%- endif -%}
 
 <div
   class="product-media{% if section.settings.thumbnail_position == 'side' %} product-media--thumb-side{% endif %}"

@@ -135,7 +135,7 @@
           | image_tag:
             loading: lazy_loading,
             class: 'product-card__image product-card__image--primary',
-            alt: product.featured_media.alt | escape,
+            alt: product.featured_media.alt,
             width: product.featured_media.width,
             height: product.featured_media.height
         }}
@@ -150,7 +150,7 @@
           | image_tag:
             loading: 'lazy',
             class: 'product-card__image product-card__image--secondary',
-            alt: second_media.alt | escape,
+            alt: second_media.alt,
             width: second_media.width,
             height: second_media.height
         }}
