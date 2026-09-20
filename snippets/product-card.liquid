@@ -166,7 +166,7 @@
     </h3>
     <p class="product-card__price">
       {%- if product.price_varies -%}
-        {{ 'products.product.from_price' | t }}
+        {{ 'products.product.price.from' | t }}
         {{ product.price_min | money }}
       {%- else -%}
         {{ product.price | money }}
